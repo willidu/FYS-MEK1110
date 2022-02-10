@@ -9,15 +9,16 @@ a2 = np.array([0, 1])
 # print(a1-a2)
 
 r = np.asarray([(1, 1), (0, 0), (3, 3), (3, 4)])
+r_used = []
+
+for i in range(len(r)):
+    for j in range(i+1, len(r)):
+        print(r[i], r[j], i, j)
 
 for counter1, r_ in enumerate(r):
     for counter2, r__ in enumerate(r):
         if np.array_equal(r_, r__):
             continue
-
-        if counter1 == counter2:
-            print(counter1, counter2)
-
         print(r_, r__, r__-r_, counter1, counter2)
 
 for c1, ri in enumerate(r):
