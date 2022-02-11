@@ -27,21 +27,21 @@ class System:
 
     def a(self, x, t):
         a = np.zeros((len(x), len(x), self.dim))
-        p = np.zeros_like(a)
+        p = np.zeros((len(x), len(x)))
         for i in range(len(x)):
             for j in range(i+1, len(x)):
                 r = x[i] - x[j]
                 r_norm = np.linalg.norm(r)
                 if r_norm <= 3:
                     p[i, j] = self.shifted_potential(r_norm, True, 3)
-                    # p[j, i] = p[i, j]
+                    p[j, i] = p[i, j]
 
                     a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
                     a[j,i] = -a[i,j]
                 else:
                     a[i, j] = [0]*self.dim
                     a[j, i] = [0]*self.dim
-        return np.sum(a, axis=0), np.sum(np.sum(p, axis=0))
+        return np.sum(a, axis=0), np.sum(p)
 
     def shifted_potential(self, r, cutoff=False, rc=None):
         # r - ndarray, list or scalar
@@ -95,12 +95,12 @@ class System:
 
     def energy(self, show=False):
         ep = self.ep
-        ep = ep/2
+        ep = ep
         plt.plot(self.t, ep, label='Potential energy')
 
         ek = np.zeros_like(self.t)
         for i, v in enumerate(self.v):
-            ek[i] = np.sum(np.dot(v_, v_) for v_ in v)
+            ek[i] = np.sum((np.dot(v_, v_) for v_ in v))
 
         plt.plot(self.t, ek, label='Kinetic energy')
 
