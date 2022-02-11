@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+
 class System:
     def __init__(self, r0, v0, n, dim, test=False):
         self.n = n
@@ -176,6 +179,18 @@ def task_3b_iv():
     s1.solve(5, 0.001)
     s1.energy(show=True)
 
+def task_3b_v():
+    r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+    v0 = np.zeros_like(r0)
+    s1 = System(r0, v0, 4, 3, test=True)
+    t, x, v = s1.solve(5, 0.001)
+    s1.write__xyz_file('task3b.xyz', x)
+    s1.energy(show=True)
+
 if __name__ == '__main__':
+    task_3a_iv()
+    task_3b_i()
+    task_3b_ii()
     task_3b_iv()
+    task_3b_v()
     pass
