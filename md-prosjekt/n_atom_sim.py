@@ -5,9 +5,11 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 class System:
-    def __init__(self, r0, v0, n, dim, test=False):
+    def __init__(self, r0, v0, n, dim, L=1, bound=False, test=False):
         self.n = n
         self.dim = dim
+        self.L = L
+        self.bound = bound
 
         def test_func():
             if len(r0) != n:
@@ -34,6 +36,8 @@ class System:
         for i in range(len(x)):
             for j in range(i+1, len(x)):
                 r = x[i] - x[j]
+                if self.bound:
+                    r = r - round(r/self.L)*self.L
                 r_norm = np.linalg.norm(r)
                 if r_norm <= 3:
                     p[i, j] = self.shifted_potential(r_norm, True, 3)
@@ -193,4 +197,3 @@ if __name__ == '__main__':
     task_3b_ii()
     task_3b_iv()
     task_3b_v()
-    pass
