@@ -44,6 +44,14 @@ def task_3d():
     s.energy(show=True)
     print('Done!')
 
+def task_3e():
+    r0 = [1, 0, 0]
+    v0 = [1, 0, 0]
+    s = System(r0, v0, 1, 3, L=3, test=False)
+    t, x, v = s.solve(15, 0.01)
+    s.write__xyz_file('task_3e.xyz', x)
+
 if __name__ == '__main__':
     # task_3c()
-    task_3d()
+    # task_3d()
+    task_3e()
