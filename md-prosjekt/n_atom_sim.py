@@ -27,29 +27,39 @@ class System:
 
     def a(self, x, t):
         a = np.zeros((len(x), len(x), self.dim))
+        p = np.zeros_like(a)
         for i in range(len(x)):
             for j in range(i+1, len(x)):
                 r = x[i] - x[j]
                 r_norm = np.linalg.norm(r)
                 if r_norm <= 3:
+                    p[i, j] = self.shifted_potential(r_norm, True, 3)
+                    # p[j, i] = p[i, j]
+
                     a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
                     a[j,i] = -a[i,j]
                 else:
                     a[i, j] = [0]*self.dim
                     a[j, i] = [0]*self.dim
-        return np.sum(a, axis=0)
+        return np.sum(a, axis=0), np.sum(np.sum(p, axis=0))
 
     def shifted_potential(self, r, cutoff=False, rc=None):
+        # r - ndarray, list or scalar
         # rc is cutoff point for distance r
         if cutoff and not rc is None:
-            p = np.zeros_like(r)
             potential_at_cutoff = 4*(rc**(-12) - rc**(-6))
-            for count, r_ in enumerate(r):
-                if r_ < rc:
-                    p[count] = 4*(r_**(-12) - r_**(-6)) - potential_at_cutoff
-                else:
-                    p[count] = 0
-            return p
+
+            if isinstance(r, (float, int, np.float64)):
+                return 4*(r**(-12) - r**(-6)) - potential_at_cutoff
+
+            elif isinstance(r, (np.ndarray, list, tuple)):
+                p = np.zeros_like(r)    
+                for count, r_ in enumerate(r):
+                    if r_ < rc:
+                        p[count] = 4*(r_**(-12) - r_**(-6)) - potential_at_cutoff
+                    else:
+                        p[count] = 0
+                return p
         else:
             return 4*(r**(-12) - r**(-6))
 
@@ -59,15 +69,19 @@ class System:
         t = np.linspace(0, T, numpoints)
         x = np.zeros((numpoints, self.n, self.dim))
         v = np.zeros_like(x)
+        ep = np.zeros_like(t)
         x[0] = self.r0; v[0] = self.v0
 
-        a_ = self.a(x[0], t[0])
+        a_, ep_ = self.a(x[0], t[0])
+        ep[0] = ep_
         for i in range(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
-            a_2 = self.a(x[i+1], t[i+1])
+            a_2, ep_ = self.a(x[i+1], t[i+1])
+            ep[i+1] = ep_
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
             a_ = a_2
 
+        self.t = t; self.x = x; self.v = v; self.ep = ep
         return t, x, v
 
     def write__xyz_file(self, filename, x):
@@ -78,6 +92,26 @@ class System:
                 for r_ in r:
                     file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
         print('printing done to',filename)
+
+    def energy(self, show=False):
+        ep = self.ep
+        ep = ep/2
+        plt.plot(self.t, ep, label='Potential energy')
+
+        ek = np.zeros_like(self.t)
+        for i, v in enumerate(self.v):
+            ek[i] = np.sum(np.dot(v_, v_) for v_ in v)
+
+        plt.plot(self.t, ek, label='Kinetic energy')
+
+        et = ek + ep
+        plt.plot(self.t, et, label='Total energy')
+        
+        plt.legend(ncol=3, loc='upper right')
+        plt.xlabel('t*')
+        plt.ylabel('Energy')
+        plt.grid()
+        plt.show() if show else None
 
 def task_3a_iv():
     r0 = [[0, 0], [1.5, 0]]
@@ -135,5 +169,13 @@ def task_3b_ii():
     t, x, v = s1.solve(5, 0.001)
     s1.write__xyz_file('4atoms.xyz', x)
 
+def task_3b_iv():
+    r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+    v0 = np.zeros_like(r0)
+    s1 = System(r0, v0, 4, 3, test=True)
+    s1.solve(5, 0.001)
+    s1.energy(show=True)
+
 if __name__ == '__main__':
+    task_3b_iv()
     pass
