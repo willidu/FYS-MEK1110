@@ -133,10 +133,6 @@ def task_3b_ii():
     s1 = System(r0, v0, 4, 3, test=True)
 
     t, x, v = s1.solve(5, 0.001)
-    print(x.shape)
-    print(x[0])
-    print(x[0][0])
-    print(x[0][0][0])
     s1.write__xyz_file('4atoms.xyz', x)
 
 if __name__ == '__main__':
