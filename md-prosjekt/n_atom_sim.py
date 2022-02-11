@@ -34,9 +34,9 @@ class System:
                 if r_norm <= 3:
                     a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
                     a[j,i] = -a[i,j]
-                else:   
-                    a[i, j] = [0, 0]
-                    a[j, i] = [0, 0]
+                else:
+                    a[i, j] = [0]*self.dim
+                    a[j, i] = [0]*self.dim
         return np.sum(a, axis=0)
 
     def shifted_potential(self, r, cutoff=False, rc=None):
@@ -70,22 +70,74 @@ class System:
 
         return t, x, v
 
-def task_3aiv():
+    def write__xyz_file(self, filename, x):
+        with open(filename, 'w') as file:
+            for r in x:
+                file.write(f'{len(r)} \n')
+                file.write(f'type  x  y  z\n')
+                for r_ in r:
+                    file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
+        print('printing done to',filename)
+
+def task_3a_iv():
     r0 = [[0, 0], [1.5, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0 , v0, 2, 2, test=True)
     t, x, v = s1.solve(5, 0.01)
 
-    r = np.linspace(2.5, 3.5, 200)
+    r = np.linspace(2, 4, 200)
     p = s1.shifted_potential(r)
     p2 = s1.shifted_potential(r, True, 3)
-    print(p.shape, r.shape)
-    plt.clf()
-    plt.close()
-    plt.plot(r, p, label='original')
-    plt.plot(r, p2, label='shifted')
+
+    plt.plot(r, p, label='Original potential')
+    plt.plot(r, p2, label='shifted potential')
+    plt.legend(loc='lower right')
+    plt.xlim(2.5, 3.5)
+    plt.xlabel('r*')
+    plt.ylabel('Potential')
+    plt.grid()
+    plt.show()
+
+def task_3b_i():
+    r0 = [[0], [1.5]]
+    v0 = np.zeros_like(r0)
+    s1 = System(r0 , v0, 2, 1, test=True)
+    t, x, v = s1.solve(5, 0.01)
+
+    d = x[:,1] - x[:,0]
+    plt.plot(t, d, label='$r_j - r_i$')
+    plt.xlabel('t*')
+    plt.ylabel('r*')
+    plt.ylim(0.8)
+    plt.grid()
     plt.legend()
     plt.show()
 
+    r0 = [[0], [0.95]]
+    v0 = np.zeros_like(r0)
+    s2 = System(r0 , v0, 2, 1, test=True)
+    t, x, v = s2.solve(5, 0.01)
+
+    d = x[:,1] - x[:,0]
+    plt.plot(t, d, label='$r_j - r_i$')
+    plt.xlabel('t*')
+    plt.ylabel('r*')
+    plt.ylim(0.8)
+    plt.grid()
+    plt.legend()
+    plt.show()
+
+def task_3b_ii():
+    r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
+    v0 = np.zeros_like(r0)
+    s1 = System(r0, v0, 4, 3, test=True)
+
+    t, x, v = s1.solve(5, 0.001)
+    print(x.shape)
+    print(x[0])
+    print(x[0][0])
+    print(x[0][0][0])
+    s1.write__xyz_file('4atoms.xyz', x)
+
 if __name__ == '__main__':
-    task_3aiv()
+    pass
