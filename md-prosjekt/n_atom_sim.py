@@ -30,6 +30,8 @@ class System:
         self.r0 = np.asarray(r0)
         self.v0 = np.asarray(v0)
 
+        print('System initiated successfully')
+
     def a(self, x, t):
         a = np.zeros((len(x), len(x), self.dim))
         p = np.zeros((len(x), len(x)))
@@ -88,6 +90,7 @@ class System:
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
             a_ = a_2
 
+        print('Simulation completed')
         self.t = t; self.x = x; self.v = v; self.ep = ep
         return t, x, v
 
@@ -98,7 +101,7 @@ class System:
                 file.write(f'type  x  y  z\n')
                 for r_ in r:
                     file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
-        print('printing done to',filename)
+        print('Printing finished for file',filename)
 
     def energy(self, show=False):
         ep = self.ep
@@ -119,81 +122,3 @@ class System:
         plt.ylabel('Energy')
         plt.grid()
         plt.show() if show else None
-
-def task_3a_iv():
-    r0 = [[0, 0], [1.5, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0 , v0, 2, 2, test=True)
-    t, x, v = s1.solve(5, 0.01)
-
-    r = np.linspace(2, 4, 200)
-    p = s1.shifted_potential(r)
-    p2 = s1.shifted_potential(r, True, 3)
-
-    plt.plot(r, p, label='Original potential')
-    plt.plot(r, p2, label='shifted potential')
-    plt.legend(loc='lower right')
-    plt.xlim(2.5, 3.5)
-    plt.xlabel('r*')
-    plt.ylabel('Potential')
-    plt.grid()
-    plt.show()
-
-def task_3b_i():
-    r0 = [[0], [1.5]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0 , v0, 2, 1, test=True)
-    t, x, v = s1.solve(5, 0.01)
-
-    d = x[:,1] - x[:,0]
-    plt.plot(t, d, label='$r_j - r_i$')
-    plt.xlabel('t*')
-    plt.ylabel('r*')
-    plt.ylim(0.8)
-    plt.grid()
-    plt.legend()
-    plt.show()
-
-    r0 = [[0], [0.95]]
-    v0 = np.zeros_like(r0)
-    s2 = System(r0 , v0, 2, 1, test=True)
-    t, x, v = s2.solve(5, 0.01)
-
-    d = x[:,1] - x[:,0]
-    plt.plot(t, d, label='$r_j - r_i$')
-    plt.xlabel('t*')
-    plt.ylabel('r*')
-    plt.ylim(0.8)
-    plt.grid()
-    plt.legend()
-    plt.show()
-
-def task_3b_ii():
-    r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, test=True)
-
-    t, x, v = s1.solve(5, 0.001)
-    s1.write__xyz_file('4atoms.xyz', x)
-
-def task_3b_iv():
-    r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, test=True)
-    s1.solve(5, 0.001)
-    s1.energy(show=True)
-
-def task_3b_v():
-    r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, test=True)
-    t, x, v = s1.solve(5, 0.001)
-    s1.write__xyz_file('task3b.xyz', x)
-    s1.energy(show=True)
-
-if __name__ == '__main__':
-    task_3a_iv()
-    task_3b_i()
-    task_3b_ii()
-    task_3b_iv()
-    task_3b_v()
