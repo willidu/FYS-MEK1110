@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import numba
 
 class System:
     def __init__(self, r0, v0, n, dim, test=False):
@@ -32,9 +31,27 @@ class System:
             for j in range(i+1, len(x)):
                 r = x[i] - x[j]
                 r_norm = np.linalg.norm(r)
-                a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
-                a[j,i] = -a[i,j]
+                if r_norm <= 3:
+                    a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
+                    a[j,i] = -a[i,j]
+                else:   
+                    a[i, j] = [0, 0]
+                    a[j, i] = [0, 0]
         return np.sum(a, axis=0)
+
+    def shifted_potential(self, r, cutoff=False, rc=None):
+        # rc is cutoff point for distance r
+        if cutoff and not rc is None:
+            p = np.zeros_like(r)
+            potential_at_cutoff = 4*(rc**(-12) - rc**(-6))
+            for count, r_ in enumerate(r):
+                if r_ < rc:
+                    p[count] = 4*(r_**(-12) - r_**(-6)) - potential_at_cutoff
+                else:
+                    p[count] = 0
+            return p
+        else:
+            return 4*(r**(-12) - r**(-6))
 
     def solve(self, T, dt):
         # Using the Velocity Verlet integration method
@@ -53,15 +70,22 @@ class System:
 
         return t, x, v
 
-if __name__ == '__main__':
+def task_3aiv():
     r0 = [[0, 0], [1.5, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0 , v0, 2, 2, test=True)
     t, x, v = s1.solve(5, 0.01)
 
-    print(x[0])
-
-    d = x[:,1] - x[:,0]
-    d = d[:,0]
-    plt.plot(t, d)
+    r = np.linspace(2.5, 3.5, 200)
+    p = s1.shifted_potential(r)
+    p2 = s1.shifted_potential(r, True, 3)
+    print(p.shape, r.shape)
+    plt.clf()
+    plt.close()
+    plt.plot(r, p, label='original')
+    plt.plot(r, p2, label='shifted')
+    plt.legend()
     plt.show()
+
+if __name__ == '__main__':
+    task_3aiv()
