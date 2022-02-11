@@ -85,13 +85,9 @@ def task_3d():
     r0 = lattice(n=4, L=1.7*4)
     v0 = np.zeros_like(r0)
     s = System(r0, v0, 256, 3, True)
-    print('System initiated')
     t, x, v = s.solve(5, 0.01)
-    print('Simulation complete, writing to file.')
     s.write__xyz_file('3d.xyz', x)
-    print('Energy calculations started')
     s.energy(show=True)
-    print('Done!')
 
 def task_3e():
     r0 = [1, 0, 0]
@@ -107,5 +103,5 @@ if __name__ == '__main__':
     task_3b_iv()
     task_3b_v()
     task_3c()
-    # task_3d()
+    task_3d()
     task_3e()
