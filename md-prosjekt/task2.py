@@ -80,7 +80,7 @@ def task_2c_iv():
         plt.show()
 
 def task_2c_v():
-    for dt in (1e-1, 1e-2, 1e-3, 1e-4, 1e-5):
+    for dt in (1e-1, 1e-2, 1e-3, 1e-4):
         print(dt)
         for solver in (EulerCromer, VelocityVerlet):
             t, x, v = solver(5, dt, (0, 1.5), (0, 0))
@@ -103,7 +103,7 @@ def task_2c_v():
 
 def task_2d_i():
     t, x, v = VelocityVerlet(5, 0.01, (0, 1.5), (0, 0))
-    with open('data1_5.xyz', 'w') as file:
+    with open('2d_i_1.xyz', 'w') as file:
         for r in x:
             file.write(f'{len(r)} \n')
             file.write(f'type  x  y  z\n')
@@ -111,7 +111,7 @@ def task_2d_i():
             file.write(f'Ar   0  {r[1]}  0\n')
 
     t, x, v = VelocityVerlet(5, 0.01, (0, .95), (0, 0))
-    with open('data0_95.xyz', 'w') as file:
+    with open('2d_i_2.xyz', 'w') as file:
         for r in x:
             file.write(f'{len(r)} \n')
             file.write(f'type  x  y  z\n')

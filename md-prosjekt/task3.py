@@ -55,7 +55,7 @@ def task_3b_ii():
     s1 = System(r0, v0, 4, 3, test=True)
 
     t, x, v = s1.solve(5, 0.001)
-    s1.write__xyz_file('4atoms.xyz', x)
+    s1.write__xyz_file('3b_ii.xyz', x)
 
 def task_3b_iv():
     r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
@@ -69,7 +69,7 @@ def task_3b_v():
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, test=True)
     t, x, v = s1.solve(5, 0.001)
-    s1.write__xyz_file('task3b.xyz', x)
+    s1.write__xyz_file('3b_v.xyz', x)
     s1.energy(show=True)
 
 def task_3c():
@@ -88,7 +88,7 @@ def task_3d():
     print('System initiated')
     t, x, v = s.solve(5, 0.01)
     print('Simulation complete, writing to file.')
-    s.write__xyz_file('task_3d.xyz', x)
+    s.write__xyz_file('3d.xyz', x)
     print('Energy calculations started')
     s.energy(show=True)
     print('Done!')
@@ -98,7 +98,7 @@ def task_3e():
     v0 = [1, 0, 0]
     s = System(r0, v0, 1, 3, L=3, test=False)
     t, x, v = s.solve(15, 0.01)
-    s.write__xyz_file('task_3e.xyz', x)
+    s.write__xyz_file('3e.xyz', x)
 
 if __name__ == '__main__':
     task_3a_iv()
@@ -107,5 +107,5 @@ if __name__ == '__main__':
     task_3b_iv()
     task_3b_v()
     task_3c()
-    task_3d()
+    # task_3d()
     task_3e()
