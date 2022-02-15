@@ -5,11 +5,12 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 class System:
-    def __init__(self, r0, v0, n, dim, L=1, bound=False, test=False):
+    def __init__(self, r0, v0, n, dim, L=1, rc=None, bound=False, test=False):
         self.n = n
         self.dim = dim
         self.L = L
         self.bound = bound
+        self.rc = rc
 
         def test_func():
             if len(r0) != n:
@@ -33,32 +34,34 @@ class System:
         print('System initiated successfully')
 
     def a(self, x, t):
-        a = np.zeros((len(x), len(x), self.dim))
-        p = np.zeros((len(x), len(x)))
+        a = np.zeros((len(x), self.dim))
+        p = np.zeros((len(x), self.dim))
+
         for i in range(len(x)):
-            for j in range(i+1, len(x)):
-                r = x[i] - x[j]
-                if self.bound:
-                    r = r - round(r/self.L)*self.L
-                r_norm = np.linalg.norm(r)
-                if r_norm <= 3:
-                    p[i, j] = self.potential(r_norm, rc=3)
-                    p[j, i] = p[i, j]
+            r = x[np.arange(self.n)!=i] - x[i]
+            
+            if self.bound:
+                r = r - round(r/self.L)*self.L
 
-                    a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
-                    a[j,i] = -a[i,j]
-                else:
-                    a[i, j] = [0]*self.dim
-                    a[j, i] = [0]*self.dim
-        return np.sum(a, axis=0), np.sum(p)
+            r_norm = np.linalg.norm(r, axis=1)
 
-    def potential(self, r, sigma=1, epsilon=1, rc=None):
+            p[i] = self.potential(r_norm)
+
+            a[i] = np.sum(np.where(
+                        r_norm < 3, 
+                        -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))*r/(r_norm)**2), 
+                        0),
+                    axis=0)
+
+        return a, np.sum(p)
+
+    def potential(self, r, sigma=1, epsilon=1):
         s6 = (sigma/r)**6
         s12 = s6 * s6
-        if rc is not None:
-            return np.where(r < 3, 4*epsilon*(s12-s6) - 4*epsilon*((sigma/rc)**12 - (sigma/rc)**6), 0)
-        else:
+        if self.rc is None:
             return 4*epsilon*(s12-s6)
+        else:
+            return np.where(r < 3, 4*epsilon*(s12-s6) - 4*epsilon*((sigma/self.rc)**12 - (sigma/self.rc)**6), 0)
 
     def solve(self, T, dt):
         # Using the Velocity Verlet integration method
@@ -92,17 +95,16 @@ class System:
         print('Printing finished for file',filename)
 
     def energy(self, show=False):
-        ep = self.ep
-        ep = ep
-        plt.plot(self.t, ep, label='Potential energy')
+        plt.plot(self.t, self.ep, label='Potential energy')
 
+        # ek = np.sum(v**2) / 2
         ek = np.zeros_like(self.t)
         for i, v in enumerate(self.v):
             ek[i] = np.sum((np.dot(v_, v_) for v_ in v))
 
         plt.plot(self.t, ek, label='Kinetic energy')
 
-        et = ek + ep
+        et = ek + self.ep
         plt.plot(self.t, et, label='Total energy')
         
         plt.legend(ncol=3, loc='upper right')
