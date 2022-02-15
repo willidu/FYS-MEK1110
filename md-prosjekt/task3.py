@@ -5,11 +5,11 @@ def task_3a_iv():
     r0 = [[0, 0], [1.5, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0 , v0, 2, 2, test=True)
-    t, x, v = s1.solve(5, 0.01)
+    s2 = System(r0 , v0, 2, 2, rc=3, test=True)
 
     r = np.linspace(2, 4, 200)
     p = s1.potential(r)
-    p2 = s1.potential(r, rc=3)
+    p2 = s2.potential(r)
 
     plt.plot(r, p, label='Original potential')
     plt.plot(r, p2, label='shifted potential')
@@ -23,7 +23,7 @@ def task_3a_iv():
 def task_3b_i():
     r0 = [[0], [1.5]]
     v0 = np.zeros_like(r0)
-    s1 = System(r0 , v0, 2, 1, test=True)
+    s1 = System(r0 , v0, 2, 1, rc=3, test=True)
     t, x, v = s1.solve(5, 0.01)
 
     d = x[:,1] - x[:,0]
@@ -35,9 +35,11 @@ def task_3b_i():
     plt.legend()
     plt.show()
 
+    s1.energy(show=True)
+
     r0 = [[0], [0.95]]
     v0 = np.zeros_like(r0)
-    s2 = System(r0 , v0, 2, 1, test=True)
+    s2 = System(r0 , v0, 2, 1, rc=3, test=True)
     t, x, v = s2.solve(5, 0.01)
 
     d = x[:,1] - x[:,0]
@@ -49,26 +51,28 @@ def task_3b_i():
     plt.legend()
     plt.show()
 
+    s2.energy(show=True)
+
 def task_3b_ii():
     r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, test=True)
+    s1 = System(r0, v0, 4, 3, rc=3, test=True)
 
-    t, x, v = s1.solve(5, 0.001)
+    t, x, v = s1.solve(5, 0.01)
     s1.write__xyz_file('3b_ii.xyz', x)
 
 def task_3b_iv():
     r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, test=True)
-    s1.solve(5, 0.001)
+    s1 = System(r0, v0, 4, 3, rc=3, test=True)
+    s1.solve(5, 0.01)
     s1.energy(show=True)
 
 def task_3b_v():
     r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, test=True)
-    t, x, v = s1.solve(5, 0.001)
+    s1 = System(r0, v0, 4, 3, rc=3, test=True)
+    t, x, v = s1.solve(5, 0.01)
     s1.write__xyz_file('3b_v.xyz', x)
     s1.energy(show=True)
 
@@ -97,10 +101,10 @@ def task_3e():
     s.write__xyz_file('3e.xyz', x)
 
 if __name__ == '__main__':
-    task_3a_iv()
+    # task_3a_iv()
     # task_3b_i()
     # task_3b_ii()
-    # task_3b_iv()
+    task_3b_iv()
     # task_3b_v()
     # task_3c()
     # task_3d()
