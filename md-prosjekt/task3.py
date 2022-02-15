@@ -8,8 +8,8 @@ def task_3a_iv():
     t, x, v = s1.solve(5, 0.01)
 
     r = np.linspace(2, 4, 200)
-    p = s1.shifted_potential(r)
-    p2 = s1.shifted_potential(r, True, 3)
+    p = s1.potential(r)
+    p2 = s1.potential(r, rc=3)
 
     plt.plot(r, p, label='Original potential')
     plt.plot(r, p2, label='shifted potential')
@@ -98,10 +98,10 @@ def task_3e():
 
 if __name__ == '__main__':
     task_3a_iv()
-    task_3b_i()
-    task_3b_ii()
-    task_3b_iv()
-    task_3b_v()
-    task_3c()
-    task_3d()
-    task_3e()
+    # task_3b_i()
+    # task_3b_ii()
+    # task_3b_iv()
+    # task_3b_v()
+    # task_3c()
+    # task_3d()
+    # task_3e()

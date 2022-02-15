@@ -42,7 +42,7 @@ class System:
                     r = r - round(r/self.L)*self.L
                 r_norm = np.linalg.norm(r)
                 if r_norm <= 3:
-                    p[i, j] = self.shifted_potential(r_norm, True, 3)
+                    p[i, j] = self.potential(r_norm, rc=3)
                     p[j, i] = p[i, j]
 
                     a[i,j] = -(24*(2*(r_norm)**(-12) - (r_norm)**(-6)) * (r) / (r_norm)**2)
@@ -52,25 +52,13 @@ class System:
                     a[j, i] = [0]*self.dim
         return np.sum(a, axis=0), np.sum(p)
 
-    def shifted_potential(self, r, cutoff=False, rc=None):
-        # r - ndarray, list or scalar
-        # rc is cutoff point for distance r
-        if cutoff and not rc is None:
-            potential_at_cutoff = 4*(rc**(-12) - rc**(-6))
-
-            if isinstance(r, (float, int, np.float64)):
-                return 4*(r**(-12) - r**(-6)) - potential_at_cutoff
-
-            elif isinstance(r, (np.ndarray, list, tuple)):
-                p = np.zeros_like(r)    
-                for count, r_ in enumerate(r):
-                    if r_ < rc:
-                        p[count] = 4*(r_**(-12) - r_**(-6)) - potential_at_cutoff
-                    else:
-                        p[count] = 0
-                return p
+    def potential(self, r, sigma=1, epsilon=1, rc=None):
+        s6 = (sigma/r)**6
+        s12 = s6 * s6
+        if rc is not None:
+            return np.where(r < 3, 4*epsilon*(s12-s6) - 4*epsilon*((sigma/rc)**12 - (sigma/rc)**6), 0)
         else:
-            return 4*(r**(-12) - r**(-6))
+            return 4*epsilon*(s12-s6)
 
     def solve(self, T, dt):
         # Using the Velocity Verlet integration method
