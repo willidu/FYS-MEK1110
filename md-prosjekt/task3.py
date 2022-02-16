@@ -66,7 +66,8 @@ def task_3b_iv():
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
     s1.solve(5, 0.01)
-    s1.energy(show=True)
+    print(s1.ep)
+    #s1.energy(show=True)
 
 def task_3b_v():
     r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
