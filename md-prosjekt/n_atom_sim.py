@@ -35,7 +35,7 @@ class System:
 
     def a(self, x, t):
         a = np.zeros((len(x), self.dim))
-        p = np.zeros((len(x), self.dim))
+        p = np.zeros(len(x))
 
         for i in range(len(x)):
             r = x[np.arange(self.n)!=i] - x[i]
@@ -45,14 +45,13 @@ class System:
 
             r_norm = np.linalg.norm(r, axis=1)
 
-            p[i] = self.potential(r_norm)
+            p[i] = np.sum(self.potential(r_norm))
 
             a[i] = np.sum(np.where(
                         r_norm < 3, 
                         -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))*r/(r_norm)**2), 
                         0),
                     axis=0)
-
         return a, np.sum(p)
 
     def potential(self, r, sigma=1, epsilon=1):
