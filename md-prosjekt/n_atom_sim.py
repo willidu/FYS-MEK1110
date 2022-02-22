@@ -34,10 +34,10 @@ class System:
         print('System initiated successfully')
 
     def a(self, x, t):
-        a = np.zeros((len(x), self.dim))
-        p = np.zeros(len(x))
+        a = np.zeros((self.n, self.dim))
+        p = np.zeros(self.n)
 
-        for i in range(len(x)):
+        for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
             
             if self.bound:
@@ -50,6 +50,7 @@ class System:
             r_ = np.where(r_norm < 3, -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 0)
 
             a[i] = np.einsum('i, ij -> j', r_, r)
+
         return a, np.sum(p)
 
     def potential(self, r, sigma=1, epsilon=1):

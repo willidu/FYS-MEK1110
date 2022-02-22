@@ -102,11 +102,11 @@ def task_3e():
     s.write__xyz_file('3e.xyz', x)
 
 if __name__ == '__main__':
-    # task_3a_iv()
-    # task_3b_i()
-    # task_3b_ii()
+    task_3a_iv()
+    task_3b_i()
+    task_3b_ii()
     task_3b_iv()
-    # task_3b_v()
-    # task_3c()
-    # task_3d()
+    task_3b_v()
+    task_3c()
+    task_3d()
     # task_3e()
