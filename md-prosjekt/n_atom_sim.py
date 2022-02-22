@@ -40,14 +40,16 @@ class System:
         for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
             
-            if self.bound:
-                r = r - round(r/self.L)*self.L
+            
 
             r_norm = np.linalg.norm(r, axis=1)
 
             p[i] = 0.5 * np.sum(self.potential(r_norm))
 
-            r_ = np.where(r_norm < 3, -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 0)
+            r_ = np.where(
+                r_norm < 3, 
+                -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 
+                0)
 
             a[i] = np.einsum('i, ij -> j', r_, r)
 
@@ -80,6 +82,9 @@ class System:
             a_2, ep_ = self.a(x[i+1], t[i+1])
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
             
+            if self.bound:
+                x[i+1] = x[i+1] - np.floor(x[i+1]/self.L)*self.L
+
             ep[i+1] = ep_
             ek[i] = 0.5*np.sum(v[i]**2)
 
