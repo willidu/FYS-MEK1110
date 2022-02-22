@@ -58,29 +58,29 @@ def task_3b_ii():
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
 
-    t, x, v = s1.solve(5, 0.01)
-    s1.write__xyz_file('3b_ii.xyz', x)
+    s1.solve(5, 0.01)
+    s1.write__xyz_file('3b_ii.xyz')
 
 def task_3b_iv():
     r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
-    t, x, v = s1.solve(5, 0.01)
-    s1.write__xyz_file('3_b_iv.xyz', x)
+    s1.solve(5, 0.01)
+    s1.write__xyz_file('3_b_iv.xyz')
     s1.energy(show=True)
 
 def task_3b_v():
     r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
-    t, x, v = s1.solve(5, 0.01)
-    s1.write__xyz_file('3b_v.xyz', x)
+    s1.solve(5, 0.01)
+    s1.write__xyz_file('3b_v.xyz')
     s1.energy(show=True)
 
 def task_3c():
     positions = lattice(n=3, L=20)
 
-    with open('lattice_test.xyz', 'w') as file:
+    with open(os.path.join(out_path, '3_c.xyz'), 'w') as file:
         file.write(f'{len(positions)} \n')
         file.write(f'type  x  y  z\n')
         for r_ in positions:
@@ -90,23 +90,23 @@ def task_3d():
     r0 = lattice(n=4, L=1.7*4)
     v0 = np.zeros_like(r0)
     s = System(r0, v0, 256, 3, True)
-    t, x, v = s.solve(5, 0.01)
-    s.write__xyz_file('3d.xyz', x)
+    s.solve(5, 0.01)
+    s.write__xyz_file('3d.xyz')
     s.energy(show=True)
 
 def task_3e():
     r0 = [1, 0, 0]
     v0 = [1, 0, 0]
     s = System(r0, v0, 1, 3, L=2, rc=3, bound=True, test=False)
-    t, x, v = s.solve(5, 0.01)
-    s.write__xyz_file('3e.xyz', x)
+    s.solve(5, 0.01)
+    s.write__xyz_file('3e.xyz')
 
 if __name__ == '__main__':
-    task_3a_iv()
-    task_3b_i()
-    task_3b_ii()
-    task_3b_iv()
-    task_3b_v()
+    # task_3a_iv()
+    # task_3b_i()
+    # task_3b_ii()
+    # task_3b_iv()
+    # task_3b_v()
     task_3c()
-    task_3d()
-    task_3e()
+    # task_3d()
+    # task_3e()

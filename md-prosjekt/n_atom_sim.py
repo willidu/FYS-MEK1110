@@ -2,7 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+import os
+out_path = os.path.join(os.getcwd(), 'xyz_files')
 
 class System:
     def __init__(self, r0, v0, n, dim, L=1, rc=None, bound=False, test=False):
@@ -39,8 +42,6 @@ class System:
 
         for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
-            
-            
 
             r_norm = np.linalg.norm(r, axis=1)
 
@@ -94,14 +95,14 @@ class System:
         self.t = t; self.x = x; self.v = v; self.ep = ep; self.ek = ek
         return t, x, v
 
-    def write__xyz_file(self, filename, x):
-        with open(filename, 'w') as file:
-            for r in x:
+    def write__xyz_file(self, filename):
+        with open(os.path.join(out_path, filename), 'w') as file:
+            for r in self.x:
                 file.write(f'{len(r)} \n')
                 file.write(f'type  x  y  z\n')
                 for r_ in r:
                     file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
-        print('Printing finished for file',filename)
+        print('Finished writing file',filename)
 
     def energy(self, show=False):
         plt.plot(self.t, self.ep, label='Potential energy')
