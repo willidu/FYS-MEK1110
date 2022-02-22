@@ -45,13 +45,11 @@ class System:
 
             r_norm = np.linalg.norm(r, axis=1)
 
-            p[i] = np.sum(self.potential(r_norm))
+            p[i] = 0.5 * np.sum(self.potential(r_norm))
 
-            a[i] = np.sum(np.where(
-                        r_norm < 3, 
-                        -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))*r/(r_norm)**2), 
-                        0),
-                    axis=0)
+            r_ = np.where(r_norm < 3, -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 0)
+
+            a[i] = np.einsum('i, ij -> j', r_, r)
         return a, np.sum(p)
 
     def potential(self, r, sigma=1, epsilon=1):
@@ -68,20 +66,26 @@ class System:
         t = np.linspace(0, T, numpoints)
         x = np.zeros((numpoints, self.n, self.dim))
         v = np.zeros_like(x)
-        ep = np.zeros_like(t)
         x[0] = self.r0; v[0] = self.v0
+        
+        ep = np.zeros_like(t)
+        ek = np.zeros_like(t)
 
         a_, ep_ = self.a(x[0], t[0])
         ep[0] = ep_
+
         for i in range(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
             a_2, ep_ = self.a(x[i+1], t[i+1])
-            ep[i+1] = ep_
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
+            
+            ep[i+1] = ep_
+            ek[i] = 0.5*np.sum(v[i]**2)
+
             a_ = a_2
 
         print('Simulation completed')
-        self.t = t; self.x = x; self.v = v; self.ep = ep
+        self.t = t; self.x = x; self.v = v; self.ep = ep; self.ek = ek
         return t, x, v
 
     def write__xyz_file(self, filename, x):
@@ -96,15 +100,9 @@ class System:
     def energy(self, show=False):
         plt.plot(self.t, self.ep, label='Potential energy')
 
-        # ek = np.sum(v**2) / 2
-        ek = np.zeros_like(self.t)
-        for i, v in enumerate(self.v):
-            ek[i] = np.sum((np.dot(v_, v_) for v_ in v))
+        plt.plot(self.t, self.ek, label='Kinetic energy')
 
-        plt.plot(self.t, ek, label='Kinetic energy')
-
-        et = ek + self.ep
-        plt.plot(self.t, et, label='Total energy')
+        plt.plot(self.t, self.ek+self.ep, label='Total energy')
         
         plt.legend(ncol=3, loc='upper right')
         plt.xlabel('t*')

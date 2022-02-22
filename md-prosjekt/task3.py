@@ -65,9 +65,9 @@ def task_3b_iv():
     r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
-    s1.solve(5, 0.01)
-    print(s1.ep)
-    #s1.energy(show=True)
+    t, x, v = s1.solve(5, 0.01)
+    s1.write__xyz_file('3_b_iv.xyz', x)
+    s1.energy(show=True)
 
 def task_3b_v():
     r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
