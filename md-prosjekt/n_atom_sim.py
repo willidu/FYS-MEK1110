@@ -77,6 +77,7 @@ class System:
 
         a_, ep_ = self.a(x[0], t[0])
         ep[0] = ep_
+        ek[0] = 0.5*np.sum(v[0]**2)
 
         for i in range(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
@@ -87,7 +88,7 @@ class System:
                 x[i+1] = x[i+1] - np.floor(x[i+1]/self.L)*self.L
 
             ep[i+1] = ep_
-            ek[i] = 0.5*np.sum(v[i]**2)
+            ek[i+1] = 0.5*np.sum(v[i+1]**2)
 
             a_ = a_2
 
@@ -95,7 +96,7 @@ class System:
         self.t = t; self.x = x; self.v = v; self.ep = ep; self.ek = ek
         return t, x, v
 
-    def write__xyz_file(self, filename):
+    def write_xyz_file(self, filename):
         with open(os.path.join(out_path, filename), 'w') as file:
             for r in self.x:
                 file.write(f'{len(r)} \n')

@@ -59,14 +59,13 @@ def task_3b_ii():
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
 
     s1.solve(5, 0.01)
-    s1.write__xyz_file('3b_ii.xyz')
+    s1.write_xyz_file('3b_ii.xyz')
 
 def task_3b_iv():
     r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
     s1.solve(5, 0.01)
-    s1.write__xyz_file('3_b_iv.xyz')
     s1.energy(show=True)
 
 def task_3b_v():
@@ -74,7 +73,7 @@ def task_3b_v():
     v0 = np.zeros_like(r0)
     s1 = System(r0, v0, 4, 3, rc=3, test=True)
     s1.solve(5, 0.01)
-    s1.write__xyz_file('3b_v.xyz')
+    s1.write_xyz_file('3b_v.xyz')
     s1.energy(show=True)
 
 def task_3c():
@@ -91,7 +90,7 @@ def task_3d():
     v0 = np.zeros_like(r0)
     s = System(r0, v0, 256, 3, True)
     s.solve(5, 0.01)
-    s.write__xyz_file('3d.xyz')
+    s.write_xyz_file('3d.xyz')
     s.energy(show=True)
 
 def task_3e():
@@ -99,7 +98,7 @@ def task_3e():
     v0 = [1, 0, 0]
     s = System(r0, v0, 1, 3, L=2, rc=3, bound=True, test=False)
     s.solve(5, 0.01)
-    s.write__xyz_file('3e.xyz')
+    s.write_xyz_file('3e.xyz')
 
 if __name__ == '__main__':
     # task_3a_iv()
