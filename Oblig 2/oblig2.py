@@ -20,7 +20,7 @@ a = np.zeros_like(r)
 
 for i in range(n-1):
     r_ = np.linalg.norm(r[i])
-    a[i] = -k*(1-L0/r_)/m * r[i,0], -g-k*(1-L0/r_)/m * r[i, 1]
+    a[i] = -k*(1-L0/r_)/m * r[i, 0], -g-k*(1-L0/r_)/m * r[i, 1]
     v[i+1] = v[i] + a[i]*dt
     r[i+1] = r[i] + v[i+1]*dt
 
