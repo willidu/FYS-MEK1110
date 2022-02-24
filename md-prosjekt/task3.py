@@ -106,6 +106,6 @@ if __name__ == '__main__':
     # task_3b_ii()
     # task_3b_iv()
     # task_3b_v()
-    task_3c()
-    # task_3d()
+    # task_3c()
+    task_3d()
     # task_3e()
