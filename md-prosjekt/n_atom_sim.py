@@ -19,6 +19,9 @@ class System:
             if len(r0) != n:
                 raise IndexError(f'Incorrect length of positiolal vector for {n} atoms, length of r0 is {len(r0)}')
 
+            if len(v0) != n:
+                raise IndexError(f'Incorrect length of velocity vector for {n} atoms, length of v0 is {len(v0)}')
+
             if dim > 2:
                 for a in r0:
                     if len(a) != dim:
