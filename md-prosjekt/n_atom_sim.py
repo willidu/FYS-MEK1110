@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import trange
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -46,7 +47,16 @@ class System:
         for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
 
+            if self.bound:
+                r -= np.around(r/self.L)*self.L
+
             r_norm = np.linalg.norm(r, axis=1)
+            r_norm = r_norm[r_norm != 0]
+
+            if (r_norm == 0).any():
+                # print(f'{r = }')
+                print(f'{i = }')
+                print(f'{r_norm = }')
 
             p[i] = 0.5 * np.sum(self.potential(r_norm))
 
@@ -82,7 +92,7 @@ class System:
         ep[0] = ep_
         ek[0] = 0.5*np.sum(v[0]**2)
 
-        for i in range(numpoints-1):
+        for i in trange(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
             a_2, ep_ = self.a(x[i+1], t[i+1])
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
