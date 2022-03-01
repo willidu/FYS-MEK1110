@@ -47,26 +47,33 @@ class System:
         for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
 
+            # print(f'{i = }\n{r = }')
+
             if self.bound:
+                """
+                term = np.around(r/self.L)*self.L
+                print(f'{np.linalg.norm(r-term, axis=1) = }')
+                r -= np.around(r/self.L)*self.L
+                print(f'{np.linalg.norm(r, axis=1) = }')
+                exit()
+                pass
+                """
                 r -= np.around(r/self.L)*self.L
 
-            r_norm = np.linalg.norm(r, axis=1)
-            r_norm = r_norm[r_norm != 0]
+            # print(f'{r = }')
 
-            if (r_norm == 0).any():
-                # print(f'{r = }')
-                print(f'{i = }')
-                print(f'{r_norm = }')
+            r_norm = np.linalg.norm(r, axis=1)
+            # print(f'{r_norm = }') if (r_norm == 0).any() else None
 
             p[i] = 0.5 * np.sum(self.potential(r_norm))
 
             r_ = np.where(
-                r_norm < 3, 
+                # r_norm < 3 and r_norm > 0, 
+                np.logical_and(r_norm<3, r_norm>0.1),
                 -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 
                 0)
 
             a[i] = np.einsum('i, ij -> j', r_, r)
-
         return a, np.sum(p)
 
     def potential(self, r, sigma=1, epsilon=1):

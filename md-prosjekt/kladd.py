@@ -1,62 +1,22 @@
 # kladd
 
 import numpy as np
-a = np.zeros((10, 2))
-# print(a, a.shape)
+from n_atom_sim import *
+from box import *
 
-a1 = np.array([2, 2])
-a2 = np.array([0, 1])
-# print(a1-a2)
+# r0 = [[1, 0, 0], [1, 1, 0], [-1, 0, 0], [0, -1, 0]]
+r0 = lattice(n=1, L=1.7)
+v0 = np.zeros_like(r0)
+s = System(r0, v0, 4, 3, L=1.7, rc=3, bound=True, test=True)
+# s.write_xyz_file('kladd.xyz')
+s.solve(5, 0.01)
 
-r = np.asarray([(1, 1), (0, 0), (3, 3), (3, 4)])
-r_used = []
-
-for i in range(len(r)):
-    for j in range(i+1, len(r)):
-        print(r[i], r[j], i, j)
-
-for counter1, r_ in enumerate(r):
-    for counter2, r__ in enumerate(r):
-        if np.array_equal(r_, r__):
-            continue
-        print(r_, r__, r__-r_, counter1, counter2)
-
-for c1, ri in enumerate(r):
-    for c2, rj in enumerate(r):
-        if c1 == c2:
-            continue
-        elif c2 == len(r)-1-c1:
-            print(c1, c2)
-        else: 
-            print(c1, ri, c2, rj)
-
-from two_atom_sim import *
-
-dt = 1e-6
-
-# t, x, v = Euler(5, dt, (0, 1.5), (0, 0))
-
-# ep = np.asarray([U_marked(r) for r in x])
-# plt.plot(t, ep, label='Potential energy')
-
-# ek = 0.5*v[:,0]**2 + 0.5*v[:,1]**2
-# plt.plot(t, ek, label='Kinetic energy')
-
-# et = ek + ep
-# plt.plot(t, et, label='Total energy')
-
-# plt.legend(ncol=3, loc='upper right')
-# plt.xlabel('t*')
-# plt.ylabel('Energy')
-# plt.grid()
-# plt.show()
-
-for solver in (Euler, EulerCromer, VelocityVerlet):
-    t, x, v = solver(5, dt, (0, 1.5), (0, 0))
-    ep = np.asarray([U_marked(r) for r in x])
-    ek = 0.5*v[:,0]**2 + 0.5*v[:,1]**2
-    et = ek + ep
-    plt.plot(t, et, label=solver.__name__)
-    plt.legend()
-    plt.grid()
-plt.show()
+"""
+for i in range(1):
+    for j in range(i+1,len(r0)):
+        dr = r0[i] - r0[j]
+        dr_ = dr
+        if s.bound:
+            dr = dr - np.round(dr/1.7)*1.7
+            print(np.linalg.norm(dr))
+"""
