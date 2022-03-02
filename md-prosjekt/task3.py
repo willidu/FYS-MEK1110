@@ -1,15 +1,11 @@
 from n_atom_sim import *
 from box import *
+from potential import Lennard_Jones_Potential as LJP
 
 def task_3a_iv():
-    r0 = [[0, 0], [1.5, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0 , v0, 2, 2, test=True)
-    s2 = System(r0 , v0, 2, 2, rc=3, test=True)
-
     r = np.linspace(2, 4, 200)
-    p = s1.potential(r)
-    p2 = s2.potential(r)
+    p = LJP.potential(r)
+    p2 = LJP.potential(r, rc=3)
 
     plt.plot(r, p, label='Original potential')
     plt.plot(r, p2, label='shifted potential')
@@ -79,7 +75,7 @@ def task_3b_v():
 def task_3c():
     positions = lattice(n=3, L=20)
 
-    with open(os.path.join(out_path, '3_c.xyz'), 'w') as file:
+    with open(os.path.join(System.out_path, '3_c.xyz'), 'w') as file:
         file.write(f'{len(positions)} \n')
         file.write(f'type  x  y  z\n')
         for r_ in positions:
@@ -102,7 +98,7 @@ def task_3e():
 
 if __name__ == '__main__':
     # task_3a_iv()
-    # task_3b_i()
+    task_3b_i()
     # task_3b_ii()
     # task_3b_iv()
     # task_3b_v()

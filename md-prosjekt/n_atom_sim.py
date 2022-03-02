@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import trange
@@ -5,10 +6,11 @@ from tqdm import trange
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import os
-out_path = os.path.join(os.getcwd(), 'xyz_files')
+from potential import Lennard_Jones_Potential as LJP
 
 class System:
+    out_path = os.path.join(os.getcwd(), 'xyz_files')
+
     def __init__(self, r0, v0, n, dim, L=1, rc=None, bound=False, test=False):
         self.n = n
         self.dim = dim
@@ -16,73 +18,110 @@ class System:
         self.bound = bound
         self.rc = rc
 
-        def test_func():
-            if len(r0) != n:
-                raise IndexError(f'Incorrect length of positiolal vector for {n} atoms, length of r0 is {len(r0)}')
+        def test_initials():
+                if len(r0) != n:
+                    raise IndexError(
+                        f'Incorrect length of positiolal vector for {n} atoms, length of r0 is {len(r0)}'
+                        )
 
-            if len(v0) != n:
-                raise IndexError(f'Incorrect length of velocity vector for {n} atoms, length of v0 is {len(v0)}')
+                if len(v0) != n:
+                    raise IndexError(
+                        f'Incorrect length of velocity vector for {n} atoms, length of v0 is {len(v0)}'
+                        )
 
-            if dim > 2:
-                for a in r0:
-                    if len(a) != dim:
-                        raise IndexError(f'Incorrect dimensions for positional vectors, dimension is {len(a)}, should be {dim}')
+                if dim >= 2:
+                    for a in r0:
+                        if len(a) != dim:
+                            raise IndexError(
+                                f'Incorrect dimensions for positional vectors, dimension is {len(a)}, should be {dim}'
+                                )
 
-                for a in v0:
-                    if len(a) != dim:
-                        raise IndexError(f'Incorrect dimensions for velocity vectors, dimension is {len(a)}, should be {dim}')
-            return
+                    for a in v0:
+                        if len(a) != dim:
+                            raise IndexError(
+                                f'Incorrect dimensions for velocity vectors, dimension is {len(a)}, should be {dim}'
+                                )
+                return
 
-        test_func() if test else None
+        if test:
+            test_initials()
 
-        self.r0 = np.asarray(r0)
-        self.v0 = np.asarray(v0)
+        self.r0 = np.asarray(r0, dtype='float64')
+        self.v0 = np.asarray(v0, dtype='float64')
 
         print('System initiated successfully')
 
+    def calculate_distances(self, x: np.ndarray) -> np.ndarray:
+        """
+        dist_matrix_squared : 
+            Matrix with distance between all atoms in all dimensions. Note the sign.
+        r_norm : 
+            One-dimensional array with all relative distances.
+        """
+
+        dist_matrix_squared = np.zeros((self.n, self.dim))
+        
+        for i in range(self.n):
+            r = x[np.arange(self.n)!=i] - x[i]
+
+            if self.bound:
+                r -= np.around(r/self.L)*self.L
+
+            r_norm_squared = np.einsum('ij, ij -> i', np.abs(r), r)
+            dist_matrix_squared[i] = r_norm_squared
+       
+        r_norm = np.sum(np.sqrt(np.abs(dist_matrix_squared)), axis=1)
+
+        return dist_matrix_squared, r_norm
+
+    def calculate_acceleration(self, x):
+        dist_matrix_squared, r_norm = self.calculate_distances(x)
+
+        potential_energy = np.sum(LJP.potential(r_norm, rc=self.rc))
+
+        force = np.where(
+            np.logical_and(r_norm<3, r_norm!=0),
+            -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 
+            0
+        )
+        # print(f'{force.shape = }\n{force = }')
+        # force = np.sum(force, axis=0)
+        a = np.matmul(force, x)
+        # print(f'{a.shape = }\n{a = }')
+
+
+        # print(f'{dist_matrix_squared.shape = }\n{dist_matrix_squared = }')
+        # print(f'{r_norm.shape = }\n{r_norm = }')
+        # print(f'{x.shape = }\n{x = }')
+        return a, potential_energy
+
     def a(self, x, t):
+        return self.calculate_acceleration(x)
         a = np.zeros((self.n, self.dim))
         p = np.zeros(self.n)
 
         for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
 
-            # print(f'{i = }\n{r = }')
-
             if self.bound:
-                """
-                term = np.around(r/self.L)*self.L
-                print(f'{np.linalg.norm(r-term, axis=1) = }')
                 r -= np.around(r/self.L)*self.L
-                print(f'{np.linalg.norm(r, axis=1) = }')
-                exit()
-                pass
-                """
-                r -= np.around(r/self.L)*self.L
-
-            # print(f'{r = }')
 
             r_norm = np.linalg.norm(r, axis=1)
-            # print(f'{r_norm = }') if (r_norm == 0).any() else None
 
-            p[i] = 0.5 * np.sum(self.potential(r_norm))
+            p[i] = 0.5 * np.sum(LJP.potential(r_norm))
 
             r_ = np.where(
-                # r_norm < 3 and r_norm > 0, 
                 np.logical_and(r_norm<3, r_norm>0.1),
-                -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 
+                -24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2, 
                 0)
 
             a[i] = np.einsum('i, ij -> j', r_, r)
-        return a, np.sum(p)
 
-    def potential(self, r, sigma=1, epsilon=1):
-        s6 = (sigma/r)**6
-        s12 = s6 * s6
-        if self.rc is None:
-            return 4*epsilon*(s12-s6)
-        else:
-            return np.where(r < 3, 4*epsilon*(s12-s6) - 4*epsilon*((sigma/self.rc)**12 - (sigma/self.rc)**6), 0)
+        print(f'{r_.shape = }\n{r_ = }')
+        print(f'{r_norm.shape = }\n{r_norm = }')
+        print(f'{x.shape = }\n{x = }')
+        print(f'{a.shape = }\n{a = }')
+        return a, np.sum(p)
 
     def solve(self, T, dt):
         # Using the Velocity Verlet integration method
@@ -96,6 +135,7 @@ class System:
         ek = np.zeros_like(t)
 
         a_, ep_ = self.a(x[0], t[0])
+
         ep[0] = ep_
         ek[0] = 0.5*np.sum(v[0]**2)
 
@@ -117,7 +157,7 @@ class System:
         return t, x, v
 
     def write_xyz_file(self, filename):
-        with open(os.path.join(out_path, filename), 'w') as file:
+        with open(os.path.join(System.out_path, filename), 'w') as file:
             for r in self.x:
                 file.write(f'{len(r)} \n')
                 file.write(f'type  x  y  z\n')
@@ -136,4 +176,6 @@ class System:
         plt.xlabel('t*')
         plt.ylabel('Energy')
         plt.grid()
-        plt.show() if show else None
+        
+        if show:
+            plt.show()
