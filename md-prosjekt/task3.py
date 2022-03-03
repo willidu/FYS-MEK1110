@@ -88,6 +88,7 @@ def task_3d():
     s.solve(5, 0.01)
     s.write_xyz_file('3d.xyz')
     s.energy(show=True)
+    print(s.ep)
 
 def task_3e():
     r0 = [1, 0, 0]

@@ -75,7 +75,12 @@ class System:
     def calculate_acceleration(self, x):
         dr, r_norm_squared = self.calculate_distances(x)
 
-        potential_energy = 0.5 * np.sum(LJP.potential(r_norm_squared, rc=self.rc))
+        potential_energy = 0.5 * np.sum(
+            LJP.potential(
+                r_norm_squared[r_norm_squared!=0],
+                rc=self.rc
+            )
+        )
 
         s6 = r_norm_squared**(-3)
         s12 = s6 * s6
