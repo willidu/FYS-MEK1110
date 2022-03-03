@@ -8,7 +8,7 @@ class Lennard_Jones_Potential:
 
     @staticmethod
     def potential(
-        r: np.ndarray, 
+        r_sqared: np.ndarray, 
         rc: float = None, 
         sigma: float = 1, 
         epsilon: float = 1,
@@ -18,10 +18,10 @@ class Lennard_Jones_Potential:
         if ignore_RuntimeWarning:
             warnings.filterwarnings("ignore", category=RuntimeWarning)
 
-        if type(r) is not np.ndarray:
-            r = np.asarray(r, dtype='float64')
+        if type(r_sqared) is not np.ndarray:
+            r_sqared = np.asarray(r_sqared, dtype='float64')
 
-        s6 = (sigma/r)**6
+        s6 = (sigma*sigma/r_sqared)**3
         s12 = s6 * s6
 
         if rc is None:
@@ -29,7 +29,7 @@ class Lennard_Jones_Potential:
 
         else:
             return np.where(
-                np.logical_and(r<3, r!=0), 
+                np.logical_and(r_sqared<9, r_sqared!=0), 
                 4*epsilon*((s12-s6) - ((sigma/rc)**12 - (sigma/rc)**6)), 
                 0
             )

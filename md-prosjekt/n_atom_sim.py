@@ -58,7 +58,7 @@ class System:
             One-dimensional array with all relative distances.
         """
 
-        dist_matrix_squared = np.zeros((self.n, self.dim))
+        dr = np.zeros((self.n, self.n, self.dim))
         
         for i in range(self.n):
             r = x[np.arange(self.n)!=i] - x[i]
@@ -66,31 +66,27 @@ class System:
             if self.bound:
                 r -= np.around(r/self.L)*self.L
 
-            r_norm_squared = np.einsum('ij, ij -> i', np.abs(r), r)
-            dist_matrix_squared[i] = r_norm_squared
-       
-        r_norm = np.sum(np.sqrt(np.abs(dist_matrix_squared)), axis=1)
-        
-        dist = np.sqrt(np.abs(dist_matrix_squared))
-        dist[dist_matrix_squared<0] = -1*dist[dist_matrix_squared<0]
+            dr[i, np.arange(self.n)!=i] = r
 
-        return dist, r_norm
+        r_norm_squared = np.einsum('ijk,ijk->ij', dr, dr)
+
+        return dr, r_norm_squared
 
     def calculate_acceleration(self, x):
-        dist, r_norm = self.calculate_distances(x)
-        potential_energy = 0.5 * np.sum(LJP.potential(r_norm, rc=self.rc))
+        dr, r_norm_squared = self.calculate_distances(x)
+
+        potential_energy = 0.5 * np.sum(LJP.potential(r_norm_squared, rc=self.rc))
+
+        s6 = r_norm_squared**(-3)
+        s12 = s6 * s6
 
         force = np.where(
-            np.logical_and(r_norm<3, r_norm!=0),
-            -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 
+            np.logical_and(r_norm_squared<9, r_norm_squared!=0),
+            -1*(24*(2*s12-s6)/r_norm_squared), 
             0
         )
 
-        a = np.einsum('i, ij -> i', force, dist)
-        print(f'{force.shape = }\n{force = }')
-        print(f'{dist.shape = }\n{dist = }')
-        print(f'{a.shape = }\n{a = }')
-        a = np.reshape(a, (self.n, self.dim))
+        a = np.einsum('ij,ijk->ik', force, dr)
 
         return a, potential_energy
 

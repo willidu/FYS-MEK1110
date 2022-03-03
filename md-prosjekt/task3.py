@@ -4,8 +4,8 @@ from potential import Lennard_Jones_Potential as LJP
 
 def task_3a_iv():
     r = np.linspace(2, 4, 200)
-    p = LJP.potential(r)
-    p2 = LJP.potential(r, rc=3)
+    p = LJP.potential(r**2)
+    p2 = LJP.potential(r**2, rc=3)
 
     plt.plot(r, p, label='Original potential')
     plt.plot(r, p2, label='shifted potential')
@@ -97,8 +97,8 @@ def task_3e():
     s.write_xyz_file('3e.xyz')
 
 if __name__ == '__main__':
-    # task_3a_iv()
-    # task_3b_i()
+    task_3a_iv()
+    task_3b_i()
     task_3b_ii()
     task_3b_iv()
     task_3b_v()
