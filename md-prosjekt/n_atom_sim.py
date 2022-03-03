@@ -2,11 +2,10 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import trange
-
+from potential import Lennard_Jones_Potential as LJP
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-from potential import Lennard_Jones_Potential as LJP
 
 class System:
     out_path = os.path.join(os.getcwd(), 'xyz_files')
@@ -53,7 +52,7 @@ class System:
 
     def calculate_distances(self, x: np.ndarray) -> np.ndarray:
         """
-        dist_matrix_squared : 
+        dist : 
             Matrix with distance between all atoms in all dimensions. Note the sign.
         r_norm : 
             One-dimensional array with all relative distances.
@@ -71,57 +70,29 @@ class System:
             dist_matrix_squared[i] = r_norm_squared
        
         r_norm = np.sum(np.sqrt(np.abs(dist_matrix_squared)), axis=1)
+        
+        dist = np.sqrt(np.abs(dist_matrix_squared))
+        dist[dist_matrix_squared<0] = -1*dist[dist_matrix_squared<0]
 
-        return dist_matrix_squared, r_norm
+        return dist, r_norm
 
     def calculate_acceleration(self, x):
-        dist_matrix_squared, r_norm = self.calculate_distances(x)
-
-        potential_energy = np.sum(LJP.potential(r_norm, rc=self.rc))
+        dist, r_norm = self.calculate_distances(x)
+        potential_energy = 0.5 * np.sum(LJP.potential(r_norm, rc=self.rc))
 
         force = np.where(
             np.logical_and(r_norm<3, r_norm!=0),
             -1*(24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2), 
             0
         )
-        # print(f'{force.shape = }\n{force = }')
-        # force = np.sum(force, axis=0)
-        a = np.matmul(force, x)
-        # print(f'{a.shape = }\n{a = }')
 
-
-        # print(f'{dist_matrix_squared.shape = }\n{dist_matrix_squared = }')
-        # print(f'{r_norm.shape = }\n{r_norm = }')
-        # print(f'{x.shape = }\n{x = }')
-        return a, potential_energy
-
-    def a(self, x, t):
-        return self.calculate_acceleration(x)
-        a = np.zeros((self.n, self.dim))
-        p = np.zeros(self.n)
-
-        for i in range(self.n):
-            r = x[np.arange(self.n)!=i] - x[i]
-
-            if self.bound:
-                r -= np.around(r/self.L)*self.L
-
-            r_norm = np.linalg.norm(r, axis=1)
-
-            p[i] = 0.5 * np.sum(LJP.potential(r_norm))
-
-            r_ = np.where(
-                np.logical_and(r_norm<3, r_norm>0.1),
-                -24*(2*(r_norm)**(-12)-(r_norm)**(-6))/(r_norm)**2, 
-                0)
-
-            a[i] = np.einsum('i, ij -> j', r_, r)
-
-        print(f'{r_.shape = }\n{r_ = }')
-        print(f'{r_norm.shape = }\n{r_norm = }')
-        print(f'{x.shape = }\n{x = }')
+        a = np.einsum('i, ij -> i', force, dist)
+        print(f'{force.shape = }\n{force = }')
+        print(f'{dist.shape = }\n{dist = }')
         print(f'{a.shape = }\n{a = }')
-        return a, np.sum(p)
+        a = np.reshape(a, (self.n, self.dim))
+
+        return a, potential_energy
 
     def solve(self, T, dt):
         # Using the Velocity Verlet integration method
@@ -134,14 +105,14 @@ class System:
         ep = np.zeros_like(t)
         ek = np.zeros_like(t)
 
-        a_, ep_ = self.a(x[0], t[0])
+        a_, ep_ = self.calculate_acceleration(x[0])
 
         ep[0] = ep_
         ek[0] = 0.5*np.sum(v[0]**2)
 
         for i in trange(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
-            a_2, ep_ = self.a(x[i+1], t[i+1])
+            a_2, ep_ = self.calculate_acceleration(x[i+1])
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
             
             if self.bound:
