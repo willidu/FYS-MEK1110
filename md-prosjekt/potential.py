@@ -1,5 +1,7 @@
 import numpy as np
 import warnings
+import numpy.typing as npt
+from typing import Optional
 
 
 class Lennard_Jones_Potential:
@@ -8,8 +10,8 @@ class Lennard_Jones_Potential:
 
     @staticmethod
     def potential(
-        r_sqared: np.ndarray, 
-        rc: float = None, 
+        r_sqared: npt.ArrayLike, 
+        rc: Optional[float] = None, 
         sigma: float = 1, 
         epsilon: float = 1,
         ignore_RuntimeWarning: bool = True

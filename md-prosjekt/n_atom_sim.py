@@ -1,56 +1,83 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-from tqdm import trange
+import numpy.typing as npt
+from typing import Optional, Tuple
+import matplotlib.pyplot as plt         # type: ignore
+from tqdm import trange                 # type: ignore
+
 from potential import Lennard_Jones_Potential as LJP
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 class System:
+
     out_path = os.path.join(os.getcwd(), 'xyz_files')
 
-    def __init__(self, r0, v0, n, dim, L=1, rc=None, bound=False, test=False):
+    def __init__(
+            self,
+            r0: npt.ArrayLike,
+            v0: npt.ArrayLike, 
+            n: int,
+            dim: int = 3,
+            L: float = 1.,
+            rc: Optional[float] = None,
+            bound: bool = False,
+            test: bool = False
+        ) -> None:
+
         self.n = n
         self.dim = dim
         self.L = L
         self.bound = bound
         self.rc = rc
 
-        def test_initials():
-                if len(r0) != n:
-                    raise IndexError(
-                        f'Incorrect length of positiolal vector for {n} atoms, length of r0 is {len(r0)}'
-                        )
-
-                if len(v0) != n:
-                    raise IndexError(
-                        f'Incorrect length of velocity vector for {n} atoms, length of v0 is {len(v0)}'
-                        )
-
-                if dim >= 2:
-                    for a in r0:
-                        if len(a) != dim:
-                            raise IndexError(
-                                f'Incorrect dimensions for positional vectors, dimension is {len(a)}, should be {dim}'
-                                )
-
-                    for a in v0:
-                        if len(a) != dim:
-                            raise IndexError(
-                                f'Incorrect dimensions for velocity vectors, dimension is {len(a)}, should be {dim}'
-                                )
-                return
-
-        if test:
-            test_initials()
-
         self.r0 = np.asarray(r0, dtype='float64')
         self.v0 = np.asarray(v0, dtype='float64')
 
+        def test_initials(self) -> None:
+                if type(self.n) is not int:
+                    raise IndexError(f'Number of particles must be integer, is {type(self.n)}')
+
+                if len(self.r0) != self.n:
+                    raise IndexError(
+                        f'Incorrect length of positiolal vector for {self.n} atoms, length of r0 is {len(self.r0)}'
+                    )
+
+                if len(self.v0) != self.n:
+                    raise IndexError(
+                        f'Incorrect length of velocity vector for {self.n} atoms, length of v0 is {len(self.v0)}'
+                    )
+
+                if type(self.dim) is not int or self.dim<1 or self.dim>3:
+                    raise IndexError(
+                        f'Dimension must be integer between 1 and 3 (inclusive), is {type(self.dim)} with value {self.dim}'
+                    )
+
+                if self.dim >= 2:
+                    for a in self.r0:
+                        if len(a) != self.dim:
+                            raise IndexError(
+                                f'Incorrect dimensions for positional vectors, dimension is {len(a)}, should be {self.dim}'
+                            )
+
+                    for a in self.v0:
+                        if len(a) != self.dim:
+                            raise IndexError(
+                                f'Incorrect dimensions for velocity vectors, dimension is {len(a)}, should be {self.dim}'
+                            )
+
+                if self.bound and type(self.L) is not (int or float):
+                    raise TypeError(
+                        f'Conflict in self.L and self.bound: {type(self.L) = }, {self.bound = }. self.L shound be int or float with boundaries turned on.'
+                    )
+                
+                return
+
+        if test:
+            test_initials(self)
+
         print('System initiated successfully')
 
-    def calculate_distances(self, x: np.ndarray) -> np.ndarray:
+    def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
         dist : 
             Matrix with distance between all atoms in all dimensions. Note the sign.
@@ -72,7 +99,8 @@ class System:
 
         return dr, r_norm_squared
 
-    def calculate_acceleration(self, x):
+    def calculate_acceleration(self, x: np.ndarray) -> Tuple[np.ndarray, float]:
+
         dr, r_norm_squared = self.calculate_distances(x)
 
         potential_energy = 0.5 * np.sum(
@@ -95,8 +123,9 @@ class System:
 
         return a, potential_energy
 
-    def solve(self, T, dt):
-        # Using the Velocity Verlet integration method
+    def solve(self, T: float, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """ Using the Velocity Verlet integration method """
+
         numpoints = int(np.ceil(T/dt))
         t = np.linspace(0, T, numpoints)
         x = np.zeros((numpoints, self.n, self.dim))
@@ -128,7 +157,7 @@ class System:
         self.t = t; self.x = x; self.v = v; self.ep = ep; self.ek = ek
         return t, x, v
 
-    def write_xyz_file(self, filename):
+    def write_xyz_file(self, filename: str) -> None:
         with open(os.path.join(System.out_path, filename), 'w') as file:
             for r in self.x:
                 file.write(f'{len(r)} \n')
@@ -137,7 +166,7 @@ class System:
                     file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
         print('Finished writing file',filename)
 
-    def energy(self, show=False):
+    def energy(self, show: bool=False) -> None:
         plt.plot(self.t, self.ep, label='Potential energy')
 
         plt.plot(self.t, self.ek, label='Kinetic energy')

@@ -1,6 +1,6 @@
 import numpy as np
 
-def unitcell(i, j, k, d):
+def unitcell(i: int, j: int, k: int, d: float) -> np.ndarray:
     unit_cell = d * np.asarray(
             [
                 [i, j, k], 
@@ -11,7 +11,7 @@ def unitcell(i, j, k, d):
         )
     return unit_cell
 
-def lattice(n, L):
+def lattice(n: int, L: float) -> np.ndarray:
     d = L/n
     pos = np.zeros((4*n**3, 3))
     index = 0
