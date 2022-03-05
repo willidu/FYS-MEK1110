@@ -15,12 +15,12 @@ class System:
     def __init__(
             self,
             r0: npt.ArrayLike,
-            v0: npt.ArrayLike, 
             n: int,
             dim: int = 3,
+            v0: Optional[npt.ArrayLike]=None, 
             L: float = 1.,
-            rc: Optional[float] = None,
             bound: bool = False,
+            rc: Optional[float] = None,
             test: bool = False
         ) -> None:
 
@@ -31,7 +31,10 @@ class System:
         self.rc = rc
 
         self.r0 = np.asarray(r0, dtype='float64')
-        self.v0 = np.asarray(v0, dtype='float64')
+        if v0 is None:
+            self.v0 = np.zeros_like(self.r0)
+        else:
+            self.v0 = np.asarray(v0, dtype='float64')
 
         def test_initials(self) -> None:
                 if type(self.n) is not int:
@@ -65,7 +68,7 @@ class System:
                                 f'Incorrect dimensions for velocity vectors, dimension is {len(a)}, should be {self.dim}'
                             )
 
-                if self.bound and type(self.L) is not (int or float):
+                if self.bound and (type(self.L) is (not int or  not float)):
                     raise TypeError(
                         f'Conflict in self.L and self.bound: {type(self.L) = }, {self.bound = }. self.L shound be int or float with boundaries turned on.'
                     )
@@ -76,6 +79,34 @@ class System:
             test_initials(self)
 
         print('System initiated successfully')
+
+    def set_inital_velocities(self, v0: npt.ArrayLike=None, T: float=None) -> None:
+        """ Sets initial velocity to v0 if v0 is explicit. 
+        Else if temperature is zero, sets initial velocity to zero for all particles. 
+        Else if T is nonzero, initial velocities get normally distributed with var=sqrt(T). 
+        Else does nothing.
+        """
+
+        if v0 is not None:
+
+            if v0.shape != (self.n, self.dim):
+                raise ValueError(
+                    f'Incorrect dimension for initial velocities: should be ({self.n, self.dim}), is {v0.shape}'
+                )
+
+            self.v0 = np.asarray(v0)
+
+        elif T is not None and T != 0:
+            self.T = T/119.7
+            self.v0 = np.random.normal(0, np.sqrt(T), (self.n, self.dim))
+
+        elif T == 0:
+            self.v0 = np.zeros((self.n, self.dim))
+
+    def get_temperature(self) -> np.ndarray:
+        """ Returns average temperature for simulation if solve() has been done, esle raises AttributeError. """
+
+        return np.sqrt(np.einsum('ijk,ijk->i', self.v, self.v))/(3*self.n)
 
     def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
