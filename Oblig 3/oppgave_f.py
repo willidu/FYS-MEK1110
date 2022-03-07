@@ -2,6 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 
+
+"""
+Kjøres i terminal.                   x   mu(valgfri)
+Uten friksjon: > python oppgave_f.py 0.6
+Med friksjon: > python oppgave_f.py 0.75 0.05
+"""
+
 m = 5       # kg
 k = 500     # N/m
 l0 = 0.5    # m
@@ -24,11 +31,12 @@ except IndexError:
 
 for i in range(N-1):
     if mu is not None:
-        N = m*g + k*h*(1-l0/np.sqrt(x[i]**2 + h**2))
+        N = np.abs(m*g + k*h*(1-l0/np.sqrt(x[i]**2 + h**2)))
         f = -mu*N*np.sign(v[i])
-        a = (-k*x[i]*(1-l0/np.sqrt(x[i]**2 + h**2)) + f)/m
     else:
-        a = -k/m*x[i]*(1-l0/np.sqrt(x[i]**2 + h**2))
+        f = 0
+
+    a = (-k*x[i]*(1-l0/np.sqrt(x[i]**2 + h**2)) + f)/m
     v[i+1] = v[i] + a*dt
     x[i+1] = x[i] + v[i+1]*dt
 
@@ -42,7 +50,8 @@ plt.xlabel('t [s]')
 plt.show()
 
 ek = 0.5*m*v**2
-ep = m*g*h + 0.5*k*(np.sqrt(x**2+h**2)-l0)**2
+# ep = 0.5*k*(np.sqrt(x**2+h**2)-l0)**2 + m*g*h
+ep = -ek
 plt.plot(x, ek, label='Kinetic energy')
 plt.plot(x, ep, label='Potential energy')
 plt.plot(x, ek+ep, label='total energy')
