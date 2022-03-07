@@ -106,7 +106,8 @@ class System:
     def get_temperature(self) -> np.ndarray:
         """ Returns average temperature for simulation if solve() has been done, esle raises AttributeError. """
 
-        return np.sqrt(np.einsum('ijk,ijk->i', self.v, self.v))/(3*self.n)
+        # return 119.7/(3*self.n) * np.sum(self.v**2, axis=(1,2))
+        return 119.7*np.sqrt(np.einsum('ijk,ijk->i', self.v, self.v))/(3*self.n)
 
     def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
