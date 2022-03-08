@@ -17,7 +17,7 @@ def task_4_a_ii():
     plt.legend()
     plt.show()
 
-def task_4_a_ii():
+def task_4_a_iii():
     dt = 0.001
     cutoff_index = int(0.5/dt)
     t_ = []
@@ -98,7 +98,7 @@ def task_4_b_v():
 
 if __name__ == '__main__':
     # task_4_a_ii()
-    # task_4_a_ii()
-    # task_4_b_ii()
+    # task_4_a_iii()
+    task_4_b_ii()
     # task_4_b_iii()
-    task_4_b_v()
+    # task_4_b_v()

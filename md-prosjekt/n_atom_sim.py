@@ -1,11 +1,10 @@
 import os
 import numpy as np
 import numpy.typing as npt
+import warnings
 from typing import Optional, Tuple
 import matplotlib.pyplot as plt         # type: ignore
 from tqdm import trange                 # type: ignore
-
-from potential import Lennard_Jones_Potential as LJP
 
 
 class System:
@@ -110,6 +109,34 @@ class System:
 
         return 119.7/(3*self.n)*np.einsum('ijk,ijk->i', self.v, self.v)
 
+    @staticmethod
+    def LJP(
+        r_sqared: npt.ArrayLike, 
+        rc: Optional[float] = None, 
+        sigma: float = 1, 
+        epsilon: float = 1,
+        ignore_RuntimeWarning: bool = True
+    ) -> np.ndarray:
+
+        if ignore_RuntimeWarning:
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+        if type(r_sqared) is not np.ndarray:
+            r_sqared = np.asarray(r_sqared, dtype='float64')
+
+        s6 = (sigma*sigma/r_sqared)**3
+        s12 = s6 * s6
+
+        if rc is None:
+            return 4*epsilon*(s12-s6)
+
+        else:
+            return np.where(
+                np.logical_and(r_sqared<9, r_sqared!=0), 
+                4*epsilon*((s12-s6) - ((sigma/rc)**12 - (sigma/rc)**6)), 
+                0
+            )
+
     def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
         dist : 
@@ -137,7 +164,7 @@ class System:
         dr, r_norm_squared = self.calculate_distances(x)
 
         potential_energy = 0.5 * np.sum(
-            LJP.potential(
+            System.LJP(
                 r_norm_squared[r_norm_squared!=0],
                 rc=self.rc
             )
