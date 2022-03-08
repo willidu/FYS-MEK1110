@@ -18,7 +18,7 @@ class System:
             n: int,
             dim: int = 3,
             v0: Optional[npt.ArrayLike]=None, 
-            L: float = 1.,
+            L: Optional[float] = None,
             bound: bool = False,
             rc: Optional[float] = None,
             test: bool = False
@@ -26,7 +26,6 @@ class System:
 
         self.n = n
         self.dim = dim
-        self.L = L
         self.bound = bound
         self.rc = rc
 
@@ -35,6 +34,11 @@ class System:
             self.v0 = np.zeros_like(self.r0)
         else:
             self.v0 = np.asarray(v0, dtype='float64')
+
+        if type(L) is (int or float):
+            self.L = L
+        elif L is None and self.bound:
+            self.L = 1.7*np.cbrt(self.n/4)
 
         def test_initials(self) -> None:
                 if type(self.n) is not int:
@@ -88,26 +92,23 @@ class System:
         """
 
         if v0 is not None:
+            self.v0 = np.asarray(v0)
 
-            if v0.shape != (self.n, self.dim):
+            if self.v0.shape != (self.n, self.dim):
                 raise ValueError(
                     f'Incorrect dimension for initial velocities: should be ({self.n, self.dim}), is {v0.shape}'
                 )
 
-            self.v0 = np.asarray(v0)
-
         elif T is not None and T != 0:
-            self.T = T/119.7
-            self.v0 = np.random.normal(0, np.sqrt(T), (self.n, self.dim))
+            self.v0 = np.random.normal(0, np.sqrt(T/119.7), (self.n, self.dim))
 
         elif T == 0:
             self.v0 = np.zeros((self.n, self.dim))
 
-    def get_temperature(self) -> np.ndarray:
+    def get_temperatures(self) -> np.ndarray:
         """ Returns average temperature for simulation if solve() has been done, esle raises AttributeError. """
 
-        # return 119.7/(3*self.n) * np.sum(self.v**2, axis=(1,2))
-        return 119.7*np.sqrt(np.einsum('ijk,ijk->i', self.v, self.v))/(3*self.n)
+        return 119.7/(3*self.n)*np.einsum('ijk,ijk->i', self.v, self.v)
 
     def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -158,19 +159,16 @@ class System:
     def solve(self, T: float, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """ Using the Velocity Verlet integration method """
 
+        self.dt = dt
         numpoints = int(np.ceil(T/dt))
         t = np.linspace(0, T, numpoints)
         x = np.zeros((numpoints, self.n, self.dim))
         v = np.zeros_like(x)
         x[0] = self.r0; v[0] = self.v0
         
-        ep = np.zeros_like(t)
-        ek = np.zeros_like(t)
-
         a_, ep_ = self.calculate_acceleration(x[0])
-
+        ep = np.zeros_like(t)
         ep[0] = ep_
-        ek[0] = 0.5*np.sum(v[0]**2)
 
         for i in trange(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
@@ -181,12 +179,12 @@ class System:
                 x[i+1] = x[i+1] - np.floor(x[i+1]/self.L)*self.L
 
             ep[i+1] = ep_
-            ek[i+1] = 0.5*np.sum(v[i+1]**2)
-
             a_ = a_2
 
+        self.t = t; self.x = x; self.v = v
+        self.ep = ep; self.ek = 0.5*np.einsum('ijk,ijk->i', self.v, self.v)
+
         print('Simulation completed')
-        self.t = t; self.x = x; self.v = v; self.ep = ep; self.ek = ek
         return t, x, v
 
     def write_xyz_file(self, filename: str) -> None:
@@ -212,3 +210,12 @@ class System:
         
         if show:
             plt.show()
+
+    def calculate_velocity_correlation(self):
+        return np.sum(np.einsum('ijk,jk->ij', self.v, self.v0)/np.einsum('ij,ij->i',self.v0, self.v0), axis=1)/self.n
+
+    def diffusion_coefficient(self):
+        cutoff_index = int(3*self.dt)
+        A = self.calculate_velocity_correlation()
+        i = 1/3*np.trapz(A, self.t)
+        return i
