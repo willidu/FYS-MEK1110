@@ -50,12 +50,11 @@ plt.xlabel('t [s]')
 plt.show()
 
 ek = 0.5*m*v**2
-# ep = 0.5*k*(np.sqrt(x**2+h**2)-l0)**2 + m*g*h
 ep = -ek
 plt.plot(x, ek, label='Kinetic energy')
 plt.plot(x, ep, label='Potential energy')
 plt.plot(x, ek+ep, label='total energy')
 plt.ylabel('Energy [J]')
 plt.xlabel('x [m]')
-plt.legend()
+plt.legend(ncol=3)
 plt.show()
