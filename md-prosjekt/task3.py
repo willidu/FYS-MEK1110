@@ -1,11 +1,10 @@
 from n_atom_sim import *
 from box import *
-from potential import Lennard_Jones_Potential as LJP
 
 def task_3a_iv():
     r = np.linspace(2, 4, 200)
-    p = LJP.potential(r**2)
-    p2 = LJP.potential(r**2, rc=3)
+    p = MD.LJP(r**2)
+    p2 = MD.LJP(r**2, rc=3)
 
     plt.plot(r, p, label='Original potential')
     plt.plot(r, p2, label='shifted potential')
@@ -17,9 +16,11 @@ def task_3a_iv():
     plt.show()
 
 def task_3b_i():
-    r0 = [[0], [1.5]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0 , v0, 2, 1, rc=3, test=True)
+    s1 = MD(r0=[[0], [1.5]],
+            n=2,
+            dim=1,
+            rc=3,
+            test=True)
     t, x, v = s1.solve(5, 0.01)
 
     d = x[:,1] - x[:,0]
@@ -33,9 +34,11 @@ def task_3b_i():
 
     s1.energy(show=True)
 
-    r0 = [[0], [0.95]]
-    v0 = np.zeros_like(r0)
-    s2 = System(r0 , v0, 2, 1, rc=3, test=True)
+    s2 = MD(r0=[[0], [0.95]],
+            n=2,
+            dim=1,
+            rc=3,
+            test=True)
     t, x, v = s2.solve(5, 0.01)
 
     d = x[:,1] - x[:,0]
@@ -50,49 +53,60 @@ def task_3b_i():
     s2.energy(show=True)
 
 def task_3b_ii():
-    r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, rc=3, test=True)
-
-    s1.solve(5, 0.01)
-    s1.write_xyz_file('3b_ii.xyz')
+    s = MD(r0=[[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
+           n=4,
+           dim=3,
+           rc=3,
+           test=True)
+    s.solve(5, 0.01)
+    s.write_xyz_file('3b_ii.xyz')
 
 def task_3b_iv():
-    r0 = [[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, rc=3, test=True)
-    s1.solve(5, 0.01)
-    s1.energy(show=True)
+    s = MD(r0=[[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
+           n=4,
+           dim=3,
+           rc=3,
+           test=True)
+    s.solve(5, 0.01)
+    s.energy(show=True)
 
 def task_3b_v():
-    r0 = [[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]]
-    v0 = np.zeros_like(r0)
-    s1 = System(r0, v0, 4, 3, rc=3, test=True)
-    s1.solve(5, 0.01)
-    s1.write_xyz_file('3b_v.xyz')
-    s1.energy(show=True)
+    s = MD(r0=[[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
+           n=4,
+           dim=3,
+           rc=3,
+           test=True)
+    s.solve(5, 0.01)
+    s.write_xyz_file('3b_v.xyz')
+    s.energy(show=True)
 
 def task_3c():
     positions = lattice(n=3, L=20)
 
-    with open(os.path.join(System.out_path, '3_c.xyz'), 'w') as file:
+    with open(os.path.join(MD.out_path, '3_c.xyz'), 'w') as file:
         file.write(f'{len(positions)} \n')
         file.write(f'type  x  y  z\n')
         for r_ in positions:
             file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
 
 def task_3d():
-    r0 = lattice(n=4, L=1.7*4)
-    v0 = np.zeros_like(r0)
-    s = System(r0, v0, 256, 3, True)
+    s = MD(r0=lattice(n=4, L=1.7*4),
+           n=256,
+           dim=3,
+           rc=3,
+           test=True)
     s.solve(5, 0.01)
     s.write_xyz_file('3d.xyz')
     s.energy(show=True)
 
 def task_3e():
-    r0 = [1, 0, 0]
-    v0 = [1, 0, 0]
-    s = System(r0, v0, 1, 3, L=2, rc=3, bound=True, test=False)
+    s = MD(r0=[1, 0, 0],
+           n=1,
+           dim=3,
+           L=2,
+           rc=3,
+           bound=True)
+    s.set_inital_velocities(v0=[1, 0, 0])
     s.solve(5, 0.01)
     s.write_xyz_file('3e.xyz')
 

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt         # type: ignore
 from tqdm import trange                 # type: ignore
 
 
-class System:
+class MD:
 
     out_path = os.path.join(os.getcwd(), 'xyz_files')
 
@@ -94,9 +94,12 @@ class System:
             self.v0 = np.asarray(v0)
 
             if self.v0.shape != (self.n, self.dim):
-                raise ValueError(
-                    f'Incorrect dimension for initial velocities: should be ({self.n, self.dim}), is {v0.shape}'
-                )
+                if len(self.v0.shape) == 1:
+                    pass
+                else:
+                    raise ValueError(
+                        f'Incorrect dimension for initial velocities: should be ({self.n, self.dim}), is {self.v0.shape}'
+                    )
 
         elif T is not None and T != 0:
             self.v0 = np.random.normal(0, np.sqrt(T/119.7), (self.n, self.dim))
@@ -164,7 +167,7 @@ class System:
         dr, r_norm_squared = self.calculate_distances(x)
 
         potential_energy = 0.5 * np.sum(
-            System.LJP(
+            MD.LJP(
                 r_norm_squared[r_norm_squared!=0],
                 rc=self.rc
             )
@@ -215,7 +218,7 @@ class System:
         return t, x, v
 
     def write_xyz_file(self, filename: str) -> None:
-        with open(os.path.join(System.out_path, filename), 'w') as file:
+        with open(os.path.join(MD.out_path, filename), 'w') as file:
             for r in self.x:
                 file.write(f'{len(r)} \n')
                 file.write(f'type  x  y  z\n')
