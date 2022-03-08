@@ -241,11 +241,18 @@ class MD:
         if show:
             plt.show()
 
-    def calculate_velocity_correlation(self):
+    def calculate_velocity_correlation(self) -> None:
+        """ Calculates the velocity correlation A(t). Make sure to run solve() first. """
+
         return np.sum(np.einsum('ijk,jk->ij', self.v, self.v0)/np.einsum('ij,ij->i',self.v0, self.v0), axis=1)/self.n
 
-    def diffusion_coefficient(self):
-        cutoff_index = int(3*self.dt)
+    def diffusion_coefficient(self) -> None:
+        """ Calculates the diffusion coefficient by integrating A(t) from 0 to 3t*. """
         A = self.calculate_velocity_correlation()
-        i = 1/3*np.trapz(A, self.t)
-        return i
+        if len(A) < 3/self.dt:
+            raise ValueError(
+                f'Simulation time has to be greater or equal to 3t*!'
+            )
+        
+        cutoff_index = int(3/self.dt)
+        return 1/3*np.trapz(A[:cutoff_index], self.t[:cutoff_index])
