@@ -55,7 +55,7 @@ def task_4_b_iii():
             rc=3,
             test=True)
     s1.set_inital_velocities(T=180)
-    t, x, v = s1.solve(5, 0.01)
+    t, x, v = s1.solve(15, 0.01)
 
     equil_pos = x[-1]
     equil_vel = v[-1]
@@ -78,7 +78,7 @@ def task_4_b_v():
             rc=3,
             test=True)
     s1.set_inital_velocities(T=180)
-    t, x, v = s1.solve(5, 0.01)
+    t, x, v = s1.solve(15, 0.01)
 
     equil_pos = x[-1]
     equil_vel = v[-1]
@@ -93,12 +93,25 @@ def task_4_b_v():
     
     D = s2.diffusion_coefficient()
     print(f'{D:.2e}')
-    # Kjøring gir 3.48e-02
+    # Kjøring gir 3.84e-02
     
+def task_4_c_ii():
+    s = MD(r0=lattice(n=4, L=1.7*4),
+           n=256,
+           bound=True,
+           rc=3,
+           test=True)
+    s.set_inital_velocities(T=180)
+    t, x, v = s.solve(20, 0.01)
+
+    D = s.mean_square_displacement(17)
+    print(f'{D = :.2e}')
+    # Kjøring gir D = -7.05e-04
 
 if __name__ == '__main__':
-    task_4_a_ii()
-    task_4_a_iii()
-    task_4_b_ii()
-    task_4_b_iii()
-    task_4_b_v()
+    # task_4_a_ii()
+    # task_4_a_iii()
+    # task_4_b_ii()
+    # task_4_b_iii()
+    # task_4_b_v()
+    task_4_c_ii()

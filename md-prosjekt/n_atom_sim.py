@@ -190,6 +190,7 @@ class MD:
         """ Using the Velocity Verlet integration method """
 
         self.dt = dt
+        self.T = T
         numpoints = int(np.ceil(T/dt))
         t = np.linspace(0, T, numpoints)
         x = np.zeros((numpoints, self.n, self.dim))
@@ -200,13 +201,18 @@ class MD:
         ep = np.zeros_like(t)
         ep[0] = ep_
 
+        if self.bound:
+            self.wallcount = np.zeros_like(x)
+
         for i in trange(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
             a_2, ep_ = self.calculate_acceleration(x[i+1])
             v[i+1] = v[i] + 0.5*(a_ + a_2)*dt
             
             if self.bound:
-                x[i+1] = x[i+1] - np.floor(x[i+1]/self.L)*self.L
+                x_ = np.floor(x[i+1]/self.L)*self.L
+                x[i+1] = x[i+1] - x_
+                self.wallcount[i+1] = x_
 
             ep[i+1] = ep_
             a_ = a_2
@@ -241,13 +247,14 @@ class MD:
         if show:
             plt.show()
 
-    def calculate_velocity_correlation(self) -> None:
+    def calculate_velocity_correlation(self) -> np.ndarray:
         """ Calculates the velocity correlation A(t). Make sure to run solve() first. """
 
         return np.sum(np.einsum('ijk,jk->ij', self.v, self.v0)/np.einsum('ij,ij->i',self.v0, self.v0), axis=1)/self.n
 
-    def diffusion_coefficient(self) -> None:
+    def diffusion_coefficient(self) -> np.ndarray:
         """ Calculates the diffusion coefficient by integrating A(t) from 0 to 3t*. """
+        
         A = self.calculate_velocity_correlation()
         if len(A) < 3/self.dt:
             raise ValueError(
@@ -256,3 +263,7 @@ class MD:
         
         cutoff_index = int(3/self.dt)
         return 1/3*np.trapz(A[:cutoff_index], self.t[:cutoff_index])
+
+    def mean_square_displacement(self, t0):
+        t0 = int(t0/self.dt)
+        return np.sum((self.x[-1]-self.x[t0])**2)/(6*self.n*(self.T-t0))
