@@ -102,12 +102,12 @@ def task_4_c_ii():
            rc=3,
            test=True)
     s.set_inital_velocities(T=180)
-    t, x, v = s.solve(20, 0.01)
+    s.solve(20, 0.01)
 
-    D = s.mean_square_displacement(17)
-    print(f'{D = :.2e}')
-    # Kjøring gir D = -7.05e-04
-
+    msd, t = s.mean_square_displacement()
+    plt.plot(t, msd)
+    plt.show()
+    
 if __name__ == '__main__':
     # task_4_a_ii()
     # task_4_a_iii()

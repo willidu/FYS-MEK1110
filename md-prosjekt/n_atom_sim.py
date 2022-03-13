@@ -264,6 +264,8 @@ class MD:
         cutoff_index = int(3/self.dt)
         return 1/3*np.trapz(A[:cutoff_index], self.t[:cutoff_index])
 
-    def mean_square_displacement(self, t0):
-        t0 = int(t0/self.dt)
-        return np.sum((self.x[-1]-self.x[t0])**2)/(6*self.n*(self.T-t0))
+    def mean_square_displacement(self):
+        t0 = int(1/self.dt)
+        r = np.sum((self.x[t0:]+self.wallcount[t0:]-self.x[t0])**2, axis=(1,2))/(self.n)
+        return r[:int(3/self.dt)], self.t[:int(3/self.dt)]
+        # return np.sum((self.x[-1]-self.x[t0])**2)/(6*self.n*(self.T-t0))
