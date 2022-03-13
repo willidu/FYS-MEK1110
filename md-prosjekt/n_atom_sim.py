@@ -4,7 +4,7 @@ import numpy.typing as npt
 import warnings
 from typing import Optional, Tuple
 import matplotlib.pyplot as plt         # type: ignore
-from tqdm import trange                 # type: ignore
+from tqdm import tqdm, trange           # type: ignore
 
 
 class MD:
@@ -201,8 +201,7 @@ class MD:
         ep = np.zeros_like(t)
         ep[0] = ep_
 
-        if self.bound:
-            self.wallcount = np.zeros_like(x)
+        self.wallcount = np.zeros_like(x)
 
         for i in trange(numpoints-1):
             x[i+1] = x[i] + v[i]*dt + 0.5*a_*dt**2
@@ -211,7 +210,7 @@ class MD:
             
             if self.bound:
                 x_ = np.floor(x[i+1]/self.L)*self.L
-                x[i+1] = x[i+1] - x_
+                x[i+1] -= x_
                 self.wallcount[i+1] = x_
 
             ep[i+1] = ep_
@@ -247,15 +246,15 @@ class MD:
         if show:
             plt.show()
 
-    def calculate_velocity_correlation(self) -> np.ndarray:
+    def vac(self) -> np.ndarray:
         """ Calculates the velocity correlation A(t). Make sure to run solve() first. """
 
         return np.sum(np.einsum('ijk,jk->ij', self.v, self.v0)/np.einsum('ij,ij->i',self.v0, self.v0), axis=1)/self.n
 
-    def diffusion_coefficient(self) -> np.ndarray:
+    def diffusion_coefficient(self) -> float:
         """ Calculates the diffusion coefficient by integrating A(t) from 0 to 3t*. """
         
-        A = self.calculate_velocity_correlation()
+        A = self.vac()
         if len(A) < 3/self.dt:
             raise ValueError(
                 f'Simulation time has to be greater or equal to 3t*!'
@@ -264,8 +263,34 @@ class MD:
         cutoff_index = int(3/self.dt)
         return 1/3*np.trapz(A[:cutoff_index], self.t[:cutoff_index])
 
-    def mean_square_displacement(self):
+    def msd(self) -> Tuple[np.ndarray, np.ndarray]:
+        """ Calculates the mean square displacement by using t0 = 1t*.
+        Returns msd and time arrays for plotting. """
+
         t0 = int(1/self.dt)
-        r = np.sum((self.x[t0:]+self.wallcount[t0:]-self.x[t0])**2, axis=(1,2))/(self.n)
+        r = np.sum((self.x[t0:]+self.wallcount[t0:]-self.x[t0])**2, axis=(1,2))/self.n
         return r[:int(3/self.dt)], self.t[:int(3/self.dt)]
-        # return np.sum((self.x[-1]-self.x[t0])**2)/(6*self.n*(self.T-t0))
+
+    def rdf(self, num_bins: int) -> Tuple[np.ndarray, np.ndarray]:
+        """ Calculates radial distribution function with num_bins. """
+
+        print('Calculating radial distribution')
+
+        bin_edges = np.linspace(0, self.rc, num_bins+1)
+        bin_centres = 0.5 * (bin_edges[1:] + bin_edges[:-1])
+        bin_sizes = bin_edges[1:] - bin_edges[:-1]
+
+        rdf = np.zeros((len(self.x),num_bins))
+
+        for i, r in enumerate(tqdm(self.x)):
+            n = np.zeros_like(bin_sizes)
+
+            for j in range(self.n):
+                dr = np.linalg.norm(r - r[j], axis=1)
+                n += np.histogram(dr, bins=bin_edges)[0]
+
+            n[0] = 0
+
+            rdf[i] = self.L**3 / self.n**2 * n / (4 * np.pi * bin_centres**2 * bin_sizes)
+
+        return np.average(rdf, axis=0), bin_centres
