@@ -5,6 +5,7 @@ import warnings
 from typing import Optional, Tuple
 import matplotlib.pyplot as plt         # type: ignore
 from tqdm import tqdm, trange           # type: ignore
+from scipy.integrate import cumtrapz
 
 
 class MD:
@@ -142,8 +143,8 @@ class MD:
 
     def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
-        dist : 
-            Matrix with distance between all atoms in all dimensions. Note the sign.
+        dist :
+            Matrix with distance between all atoms in all dimensions.
         r_norm : 
             One-dimensional array with all relative distances.
         """
@@ -251,17 +252,10 @@ class MD:
 
         return np.sum(np.einsum('ijk,jk->ij', self.v, self.v0)/np.einsum('ij,ij->i',self.v0, self.v0), axis=1)/self.n
 
-    def diffusion_coefficient(self) -> float:
-        """ Calculates the diffusion coefficient by integrating A(t) from 0 to 3t*. """
+    def diffusion_coefficient(self) -> np.ndarray:
+        """ Calculates the diffusion coefficient by integrating A(t) over entire simulation time. """
         
-        A = self.vac()
-        if len(A) < 3/self.dt:
-            raise ValueError(
-                f'Simulation time has to be greater or equal to 3t*!'
-            )
-        
-        cutoff_index = int(3/self.dt)
-        return 1/3*np.trapz(A[:cutoff_index], self.t[:cutoff_index])
+        return cumtrapz(self.vac(), self.t, initial=0)
 
     def msd(self) -> Tuple[np.ndarray, np.ndarray]:
         """ Calculates the mean square displacement by using t0 = 1t*.
@@ -287,6 +281,8 @@ class MD:
 
             for j in range(self.n):
                 dr = np.linalg.norm(r - r[j], axis=1)
+                # if self.bound:
+                #     dr -= np.around(dr/self.L)*self.L
                 n += np.histogram(dr, bins=bin_edges)[0]
 
             n[0] = 0
