@@ -212,7 +212,7 @@ class MD:
             if self.bound:
                 x_ = np.floor(x[i+1]/self.L)*self.L
                 x[i+1] -= x_
-                self.wallcount[i+1] = x_
+                self.wallcount[i+1] = self.wallcount[i] + x_
 
             ep[i+1] = ep_
             a_ = a_2
@@ -263,7 +263,7 @@ class MD:
 
         t0 = int(1/self.dt)
         r = np.sum((self.x[t0:]+self.wallcount[t0:]-self.x[t0])**2, axis=(1,2))/self.n
-        return r[:int(3/self.dt)], self.t[:int(3/self.dt)]
+        return r, self.t[t0:]
 
     def rdf(self, num_bins: int) -> Tuple[np.ndarray, np.ndarray]:
         """ Calculates radial distribution function with num_bins. """
@@ -280,9 +280,10 @@ class MD:
             n = np.zeros_like(bin_sizes)
 
             for j in range(self.n):
-                dr = np.linalg.norm(r - r[j], axis=1)
-                # if self.bound:
-                #     dr -= np.around(dr/self.L)*self.L
+                R = r - r[j]
+                if self.bound:
+                    R -= np.around(R/self.L)*self.L
+                dr = np.linalg.norm(R, axis=1)
                 n += np.histogram(dr, bins=bin_edges)[0]
 
             n[0] = 0

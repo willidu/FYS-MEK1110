@@ -102,7 +102,7 @@ def task_4_c_ii():
            rc=3,
            test=True)
     s.set_inital_velocities(T=180)
-    s.solve(6, 0.01)
+    s.solve(10, 0.01)
 
     msd, t = s.msd()
     plt.plot(t, msd)
@@ -119,7 +119,7 @@ def task_4_d_i():
     s.set_inital_velocities(T=180)
     t, x, v = s.solve(5, 0.01)
 
-    rdf_array, bin_centres = s.rdf(101)
+    rdf_array, bin_centres = s.rdf(100)
 
     plt.axhline(y=1, color='black')
     plt.plot(bin_centres, rdf_array)
@@ -128,10 +128,10 @@ def task_4_d_i():
     plt.show()
     
 if __name__ == '__main__':
-    task_4_a_ii()
-    task_4_a_iii()
-    task_4_b_ii()
-    task_4_b_iii()
-    task_4_b_v()
+    # task_4_a_ii()
+    # task_4_a_iii()
+    # task_4_b_ii()
+    # task_4_b_iii()
+    # task_4_b_v()
     task_4_c_ii()
     task_4_d_i()
