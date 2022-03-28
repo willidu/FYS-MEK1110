@@ -5,7 +5,6 @@ import warnings
 from typing import Optional, Tuple
 import matplotlib.pyplot as plt         # type: ignore
 from tqdm import tqdm, trange           # type: ignore
-from scipy.integrate import cumtrapz
 
 
 class MD:
@@ -23,6 +22,26 @@ class MD:
             rc: Optional[float] = None,
             test: bool = False
         ) -> None:
+        """
+        Parameters:
+        -----------
+        r0 :
+            Initial positions of atoms
+        n :
+            Number of atoms
+        dim :
+            Dimension of system
+        v0 :
+            Initial velocities of atoms
+        L :
+            Length of bounding box
+        bound :
+            Bool to toggle periodic boundary conditions
+        rc :
+            Potential cutoff
+        test :
+            Bool to toggle test function for initial conditions        
+        """
 
         self.n = n
         self.dim = dim
@@ -85,10 +104,13 @@ class MD:
         print('System initiated successfully')
 
     def set_inital_velocities(self, v0: npt.ArrayLike=None, T: float=None) -> None:
-        """ Sets initial velocity to v0 if v0 is explicit. 
-        Else if temperature is zero, sets initial velocity to zero for all particles. 
-        Else if T is nonzero, initial velocities get normally distributed with var=sqrt(T). 
-        Else does nothing.
+        """
+        Parameters:
+        -----------
+        v0 :
+            Array with same dimensions as initial positions with velocities for all atoms
+        T :
+            (Scalar) Temperature to set initial velocities normally distributed with var=sqrt(T)
         """
 
         if v0 is not None:
@@ -121,6 +143,27 @@ class MD:
         epsilon: float = 1,
         ignore_RuntimeWarning: bool = True
     ) -> np.ndarray:
+        """
+        Calculates the potential between atoms using the Lennard-Jones potential. 
+
+        Parameters:
+        -----------
+        r_squared :
+            1D-Array with distances between atoms squared
+        rc :
+            Potential cutoff
+        sigma :
+            Constant
+        Epsilon :
+            Constant
+        ignore_RuntimeWarning :
+            Bool to turn off RuntimeWarnings
+
+        Returns:
+        --------
+        potential :
+            Potential for all atoms with same dimenstion as r_squared
+        """
 
         if ignore_RuntimeWarning:
             warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -143,10 +186,17 @@ class MD:
 
     def calculate_distances(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """
-        dist :
-            Matrix with distance between all atoms in all dimensions.
-        r_norm : 
-            One-dimensional array with all relative distances.
+        Parameters:
+        -----------
+        x : 
+            Array containing all positions for one time point. Dim (self.n, self.dim)
+
+        Retuns:
+        -------
+        dr : 
+            matrix with all relative distances between atoms
+        r_norm_sqared : 
+            distance between atoms as flat array with scalars.
         """
 
         dr = np.zeros((self.n, self.n, self.dim))
@@ -164,6 +214,19 @@ class MD:
         return dr, r_norm_squared
 
     def calculate_acceleration(self, x: np.ndarray) -> Tuple[np.ndarray, float]:
+        """
+        Parameters:
+        -----------
+        x : 
+            Array containing all positions for one time point. Dim (self.n, self.dim)
+
+        Retuns:
+        -------
+        a : 
+            matrix with acceleration on all atoms in all dimensions
+        potential_energy : 
+            scalar value with potential energy at given time step
+        """
 
         dr, r_norm_squared = self.calculate_distances(x)
 
@@ -188,7 +251,23 @@ class MD:
         return a, potential_energy
 
     def solve(self, T: float, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """ Using the Velocity Verlet integration method """
+        """
+        Integrating using the velocity verlet method from 0 to T.
+
+        Parameters:
+        -----------
+        T :
+            Upper integration limit. 
+        dt :
+            time step
+
+        Retuns:
+        -------
+        dr : 
+            Matrix with all relative distances between atoms
+        r_norm_sqared : 
+            Distance between atoms as flat array with scalars.
+        """
 
         self.dt = dt
         self.T = T
@@ -224,6 +303,14 @@ class MD:
         return t, x, v
 
     def write_xyz_file(self, filename: str) -> None:
+        """
+        Writes positions of atoms to datafile.
+
+        Parameters:
+        -----------
+        filename : 
+            Name of file with file type (eg. 'file.xyz')
+        """
         with open(os.path.join(MD.out_path, filename), 'w') as file:
             for r in self.x:
                 file.write(f'{len(r)} \n')
@@ -232,42 +319,63 @@ class MD:
                     file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
         print('Finished writing file',filename)
 
-    def energy(self, show: bool=False) -> None:
+    def plot_energy(self) -> None:
+        """ Plots kinetic, potential and total energy"""
+
         plt.plot(self.t, self.ep, label='Potential energy')
-
         plt.plot(self.t, self.ek, label='Kinetic energy')
-
         plt.plot(self.t, self.ek+self.ep, label='Total energy')
         
         plt.legend(ncol=3, loc='upper right')
         plt.xlabel('t*')
         plt.ylabel('Energy')
         plt.grid()
-        
-        if show:
-            plt.show()
+        plt.show()
 
     def vac(self) -> np.ndarray:
-        """ Calculates the velocity correlation A(t). Make sure to run solve() first. """
+        """ Calculates velocity autocorrelation A(t). Make sure to run solve() first. """
 
         return np.sum(np.einsum('ijk,jk->ij', self.v, self.v0)/np.einsum('ij,ij->i',self.v0, self.v0), axis=1)/self.n
 
     def diffusion_coefficient(self) -> np.ndarray:
         """ Calculates the diffusion coefficient by integrating A(t) over entire simulation time. """
-        
+        from scipy.integrate import cumtrapz
+
         return cumtrapz(self.vac(), self.t, initial=0)
 
     def msd(self) -> Tuple[np.ndarray, np.ndarray]:
-        """ Calculates the mean square displacement by using t0 = 1t*.
-        Returns msd and time arrays for plotting. """
+        """
+        Calculates the mean square displacement by using t0 = 1t*.
+
+        Returns:
+        --------
+        msd :
+            1D-Array with average mean square displacement
+        time:
+            Time array for plotting msd
+        """
 
         t0 = int(1/self.dt)
-        r = np.sum((self.x[t0:]+self.wallcount[t0:]-self.x[t0])**2, axis=(1,2))/self.n
-        return r, self.t[t0:]
+        msd = np.sum((self.x[t0:]+self.wallcount[t0:]-self.x[t0])**2, axis=(1,2))/self.n
+        return msd, self.t[t0:]
 
     def rdf(self, num_bins: int) -> Tuple[np.ndarray, np.ndarray]:
-        """ Calculates radial distribution function with num_bins. """
-
+        """
+        Calculates radial distibution function with num_bins bins.
+        
+        Parameters:
+        -----------
+        num_bins :
+            Number of bins between 0 and the system's cutoff in potential (self.rc)
+        
+        Returns:
+        --------
+        rdf :
+            1D-Array with average radial distribution
+        bin_centers :
+            1D-Array with centre of bins for plotting rdf
+        """
+        
         print('Calculating radial distribution')
 
         bin_edges = np.linspace(0, self.rc, num_bins+1)

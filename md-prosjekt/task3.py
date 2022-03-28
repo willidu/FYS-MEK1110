@@ -13,6 +13,7 @@ def task_3a_iv():
     plt.xlabel('r*')
     plt.ylabel('Potential')
     plt.grid()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_a_iv.pdf'))
     plt.show()
 
 def task_3b_i():
@@ -24,15 +25,15 @@ def task_3b_i():
     t, x, v = s1.solve(5, 0.01)
 
     d = x[:,1] - x[:,0]
-    plt.plot(t, d, label='$r_j - r_i$')
+    plt.plot(t, d)
     plt.xlabel('t*')
     plt.ylabel('r*')
     plt.ylim(0.8)
     plt.grid()
-    plt.legend()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_b_i_15.pdf'))
     plt.show()
 
-    s1.energy(show=True)
+    s1.plot_energy()
 
     s2 = MD(r0=[[0], [0.95]],
             n=2,
@@ -42,15 +43,15 @@ def task_3b_i():
     t, x, v = s2.solve(5, 0.01)
 
     d = x[:,1] - x[:,0]
-    plt.plot(t, d, label='$r_j - r_i$')
+    plt.plot(t, d)
     plt.xlabel('t*')
     plt.ylabel('r*')
     plt.ylim(0.8)
     plt.grid()
-    plt.legend()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_b_i_095.pdf'))
     plt.show()
 
-    s2.energy(show=True)
+    s2.plot_energy()
 
 def task_3b_ii():
     s = MD(r0=[[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
@@ -59,7 +60,7 @@ def task_3b_ii():
            rc=3,
            test=True)
     s.solve(5, 0.01)
-    s.write_xyz_file('3b_ii.xyz')
+    s.write_xyz_file('3_b_ii.xyz')
 
 def task_3b_iv():
     s = MD(r0=[[1, 0, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
@@ -68,7 +69,8 @@ def task_3b_iv():
            rc=3,
            test=True)
     s.solve(5, 0.01)
-    s.energy(show=True)
+    s.plot_energy()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_b_iv.pdf'))
 
 def task_3b_v():
     s = MD(r0=[[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
@@ -77,11 +79,12 @@ def task_3b_v():
            rc=3,
            test=True)
     s.solve(5, 0.01)
-    s.write_xyz_file('3b_v.xyz')
-    s.energy(show=True)
+    s.write_xyz_file('3_b_v.xyz')
+    s.plot_energy()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_b_v.pdf'))
 
 def task_3c():
-    positions = lattice(n=3, L=20)
+    positions = lattice(n=3, d=20/3)
 
     with open(os.path.join(MD.out_path, '3_c.xyz'), 'w') as file:
         file.write(f'{len(positions)} \n')
@@ -90,14 +93,15 @@ def task_3c():
             file.write(f'Ar   {r_[0]}  {r_[1]}  {r_[2]}\n')
 
 def task_3d():
-    s = MD(r0=lattice(n=4, L=1.7*4),
+    s = MD(r0=lattice(n=4),
            n=256,
            dim=3,
            rc=3,
            test=True)
     s.solve(5, 0.01)
-    s.write_xyz_file('3d.xyz')
-    s.energy(show=True)
+    s.write_xyz_file('3_d.xyz')
+    s.plot_energy()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_d.pdf'))
 
 def task_3e():
     s = MD(r0=[1, 0, 0],
@@ -108,7 +112,7 @@ def task_3e():
            bound=True)
     s.set_inital_velocities(v0=[1, 0, 0])
     s.solve(5, 0.01)
-    s.write_xyz_file('3e.xyz')
+    s.write_xyz_file('3_e.xyz')
 
 if __name__ == '__main__':
     task_3a_iv()

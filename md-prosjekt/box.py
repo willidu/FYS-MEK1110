@@ -11,8 +11,17 @@ def unitcell(i: int, j: int, k: int, d: float) -> np.ndarray:
         )
     return unit_cell
 
-def lattice(n: int, L: float) -> np.ndarray:
-    d = L/n
+def lattice(n: int, d: float=1.7) -> np.ndarray:
+    """
+    Creates the face centered lattice structure with 4n^3 atoms.
+
+    Parameters:
+    -----------
+    n :
+        Number of unit cells
+    d : 
+        Constant to scale the density of atoms
+    """
     pos = np.zeros((4*n**3, 3))
     index = 0
     for i in range(n):
