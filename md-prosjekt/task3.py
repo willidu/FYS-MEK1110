@@ -70,7 +70,6 @@ def task_3b_iv():
            test=True)
     s.solve(5, 0.01)
     s.plot_energy()
-    plt.savefig(os.path.join(os.getcwd(), 'figures/3_b_iv.pdf'))
 
 def task_3b_v():
     s = MD(r0=[[1, 0.1, 0], [0, 1, 0], [-1, 0, 0], [0, -1, 0]],
@@ -81,7 +80,6 @@ def task_3b_v():
     s.solve(5, 0.01)
     s.write_xyz_file('3_b_v.xyz')
     s.plot_energy()
-    plt.savefig(os.path.join(os.getcwd(), 'figures/3_b_v.pdf'))
 
 def task_3c():
     positions = lattice(n=3, d=20/3)
