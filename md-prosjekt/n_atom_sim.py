@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import numpy.typing as npt
-import warnings
 from typing import Optional, Tuple
 import matplotlib.pyplot as plt         # type: ignore
 from tqdm import tqdm, trange           # type: ignore
@@ -166,6 +165,7 @@ class MD:
         """
 
         if ignore_RuntimeWarning:
+            import warnings
             warnings.filterwarnings("ignore", category=RuntimeWarning)
 
         if type(r_sqared) is not np.ndarray:
