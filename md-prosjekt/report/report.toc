@@ -1,0 +1,21 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {subsection}{\numberline {a.}Understanding the potential}{2}{subsection.1.1}%
+\contentsline {subsection}{\numberline {b.}Forces and equation of motion}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {c.}Units}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Two-atom simulations}{6}{section.2}%
+\contentsline {subsection}{\numberline {a.}Implementation}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {b.}Motion}{6}{subsection.2.2}%
+\contentsline {subsection}{\numberline {c.}Energy}{7}{subsection.2.3}%
+\contentsline {subsection}{\numberline {d.}Visualization}{9}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Large systems}{10}{section.3}%
+\contentsline {subsection}{\numberline {a.}Implementation}{10}{subsection.3.1}%
+\contentsline {subsection}{\numberline {b.}Verification}{11}{subsection.3.2}%
+\contentsline {subsection}{\numberline {c.}Initialisation}{12}{subsection.3.3}%
+\contentsline {subsection}{\numberline {d.}Many atoms, open boundary}{13}{subsection.3.4}%
+\contentsline {subsection}{\numberline {e.}Boundary conditions}{13}{subsection.3.5}%
+\contentsline {section}{\numberline {4}Science}{15}{section.4}%
+\contentsline {subsection}{\numberline {a.}Temperature}{15}{subsection.4.1}%
+\contentsline {subsection}{\numberline {b.}Velocity autocorrelation and diffusion coefficient}{15}{subsection.4.2}%
+\contentsline {subsection}{\numberline {c.}Mean square displacement and diffusion coefficient}{17}{subsection.4.3}%
+\contentsline {subsection}{\numberline {d.}Radial distribution function}{18}{subsection.4.4}%

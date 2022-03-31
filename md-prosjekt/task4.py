@@ -96,6 +96,7 @@ def task_4_b_v():
     t, x, v = s2.solve(3, 0.01)
     
     D = s2.diffusion_coefficient()
+    print(f'D = {D[-1]:.2e}')
     plt.plot(t, D)
     plt.xlabel('t*')
     plt.ylabel('Diffusion coefficient')

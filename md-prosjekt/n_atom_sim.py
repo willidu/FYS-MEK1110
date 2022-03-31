@@ -263,10 +263,12 @@ class MD:
 
         Retuns:
         -------
-        dr : 
-            Matrix with all relative distances between atoms
-        r_norm_sqared : 
-            Distance between atoms as flat array with scalars.
+        t : 
+            1D-Array with time values
+        x :
+            Array with positions for all atoms at all time steps
+        v :
+            Array with velocities for all atoms at all time steps
         """
 
         self.dt = dt

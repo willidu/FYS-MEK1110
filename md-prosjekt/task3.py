@@ -99,7 +99,6 @@ def task_3d():
     s.solve(5, 0.01)
     s.write_xyz_file('3_d.xyz')
     s.plot_energy()
-    plt.savefig(os.path.join(os.getcwd(), 'figures/3_d.pdf'))
 
 def task_3e():
     s = MD(r0=[1, 0, 0],
@@ -109,8 +108,15 @@ def task_3e():
            rc=3,
            bound=True)
     s.set_inital_velocities(v0=[1, 0, 0])
-    s.solve(5, 0.01)
+    t, x, v = s.solve(5, 0.01)
     s.write_xyz_file('3_e.xyz')
+
+    plt.plot(t, x[:,0:,0])
+    plt.xlabel('t*')
+    plt.ylabel('x*')
+    plt.grid()
+    plt.savefig(os.path.join(os.getcwd(), 'figures/3_e.pdf'))
+    plt.show()
 
 if __name__ == '__main__':
     task_3a_iv()
