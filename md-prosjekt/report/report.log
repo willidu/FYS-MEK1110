@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.31)  31 MAR 2022 22:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.3.31)  1 APR 2022 11:26
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**c:/Users/willi/Git/FYS-MEK1110/md-prosjekt/Report/report.tex
-(c:/Users/willi/Git/FYS-MEK1110/md-prosjekt/Report/report.tex
+**c:/Users/willi/Git/FYS-MEK1110/md-prosjekt/report/report.tex
+(c:/Users/willi/Git/FYS-MEK1110/md-prosjekt/report/report.tex
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-02-24> (C:\Users\willi\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
 Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
@@ -623,69 +623,52 @@ File: ../figures/4_a_ii.pdf Graphic file (type pdf)
 <use ../figures/4_a_ii.pdf>
 Package pdftex.def Info: ../figures/4_a_ii.pdf  used on input line 413.
 (pdftex.def)             Requested size: 300.63962pt x 225.47972pt.
-<../figures/4_b_ii.pdf, id=585, 462.52798pt x 346.89601pt>
-File: ../figures/4_b_ii.pdf Graphic file (type pdf)
-<use ../figures/4_b_ii.pdf>
-Package pdftex.def Info: ../figures/4_b_ii.pdf  used on input line 432.
-(pdftex.def)             Requested size: 231.26341pt x 173.44757pt.
-
-Overfull \hbox (22.13658pt too wide) in paragraph at lines 432--433
- [][] 
- []
-
-<../figures/4_b_iii.pdf, id=586, 462.52798pt x 346.89601pt>
-File: ../figures/4_b_iii.pdf Graphic file (type pdf)
-<use ../figures/4_b_iii.pdf>
-Package pdftex.def Info: ../figures/4_b_iii.pdf  used on input line 436.
-(pdftex.def)             Requested size: 231.26341pt x 173.44757pt.
-
-Overfull \hbox (22.13658pt too wide) in paragraph at lines 436--437
- [][] 
- []
+<../figures/long_sim_vac.pdf, id=585, 462.52798pt x 346.89601pt>
+File: ../figures/long_sim_vac.pdf Graphic file (type pdf)
+<use ../figures/long_sim_vac.pdf>
+Package pdftex.def Info: ../figures/long_sim_vac.pdf  used on input line 430.
+(pdftex.def)             Requested size: 300.63962pt x 225.47972pt.
 
 
-LaTeX Warning: `h' float specifier changed to `ht'.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [15 <../figures/4_a_ii.pdf>]
-<../figures/4_b_v.pdf, id=624, 462.52798pt x 346.89601pt>
-File: ../figures/4_b_v.pdf Graphic file (type pdf)
-<use ../figures/4_b_v.pdf>
-Package pdftex.def Info: ../figures/4_b_v.pdf  used on input line 450.
+<../figures/long_sim_diff.pdf, id=623, 462.52798pt x 346.89601pt>
+File: ../figures/long_sim_diff.pdf Graphic file (type pdf)
+<use ../figures/long_sim_diff.pdf>
+Package pdftex.def Info: ../figures/long_sim_diff.pdf  used on input line 443.
 (pdftex.def)             Requested size: 300.63962pt x 225.47972pt.
- [16 <../figures/4_b_ii.pdf> <../figures/4_b_iii.pdf
+ [16 <../figures/long_sim_vac.pdf> <../figures/long_sim_diff.pdf
 
-pdfTeX warning: pdflatex (file ../figures/4_b_iii.pdf): PDF inclusion: multiple pdfs with page group included in a single page
-> <../figures/4_b_v.pdf
-
-pdfTeX warning: pdflatex (file ../figures/4_b_v.pdf): PDF inclusion: multiple pdfs with page group included in a single page
+pdfTeX warning: pdflatex (file ../figures/long_sim_diff.pdf): PDF inclusion: multiple pdfs with page group included in a single page
 >]
-<../figures/4_c_ii.pdf, id=714, 462.52798pt x 346.89601pt>
-File: ../figures/4_c_ii.pdf Graphic file (type pdf)
-<use ../figures/4_c_ii.pdf>
-Package pdftex.def Info: ../figures/4_c_ii.pdf  used on input line 461.
+<../figures/long_sim_msd.pdf, id=681, 462.52798pt x 346.89601pt>
+File: ../figures/long_sim_msd.pdf Graphic file (type pdf)
+<use ../figures/long_sim_msd.pdf>
+Package pdftex.def Info: ../figures/long_sim_msd.pdf  used on input line 454.
 (pdftex.def)             Requested size: 300.63962pt x 225.47972pt.
- [17 <../figures/4_c_ii.pdf>]
-<../figures/4_d_i.pdf, id=752, 462.52798pt x 346.89601pt>
-File: ../figures/4_d_i.pdf Graphic file (type pdf)
-<use ../figures/4_d_i.pdf>
-Package pdftex.def Info: ../figures/4_d_i.pdf  used on input line 476.
+ [17 <../figures/long_sim_msd.pdf>]
+<../figures/long_sim_rdf.pdf, id=719, 462.52798pt x 346.89601pt>
+File: ../figures/long_sim_rdf.pdf Graphic file (type pdf)
+<use ../figures/long_sim_rdf.pdf>
+Package pdftex.def Info: ../figures/long_sim_rdf.pdf  used on input line 469.
 (pdftex.def)             Requested size: 300.63962pt x 225.47972pt.
- [18 <../figures/4_d_i.pdf>] (report.aux)
+ [18 <../figures/long_sim_rdf.pdf>] (report.aux)
 Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: AA4941FEEE0C38F08FE5B5AB46DFC8DE;3039.
  ) 
 Here is how much of TeX's memory you used:
- 14424 strings out of 478582
- 229569 string characters out of 2844344
- 586033 words of memory out of 3000000
- 32293 multiletter control sequences out of 15000+600000
+ 14417 strings out of 478582
+ 229560 string characters out of 2844344
+ 585925 words of memory out of 3000000
+ 32287 multiletter control sequences out of 15000+600000
  474669 words of font info for 49 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 60i,14n,72p,719b,1160s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 60i,14n,72p,721b,1160s stack positions out of 10000i,1000n,20000p,200000b,80000s
 <C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt10.pfb><C:/Users/willi/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on report.pdf (19 pages, 1284034 bytes).
+Output written on report.pdf (19 pages, 1273280 bytes).
 PDF statistics:
- 868 PDF objects out of 1000 (max. 8388607)
+ 835 PDF objects out of 1000 (max. 8388607)
  85 named destinations out of 1000 (max. 500000)
- 276 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 271 words of extra memory for PDF output out of 10000 (max. 10000000)
 
